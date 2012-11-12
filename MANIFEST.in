@@ -1,0 +1,2 @@
+include *.txt
+include bw2analyzer/*.py

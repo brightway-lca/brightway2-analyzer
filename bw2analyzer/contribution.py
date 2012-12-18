@@ -1,6 +1,7 @@
 # encoding: utf-8
-import numpy as np
+from __future__ import division
 from brightway2 import Database
+import numpy as np
 
 
 class ContributionAnalysis(object):
@@ -21,6 +22,28 @@ class ContributionAnalysis(object):
             np.arange(data.shape[0]).reshape((-1, 1))))
         return results[np.argsort(np.abs(data))[::-1]][:limit, :]
 
+    def top_coo_matrix(self, matrix, rows=5, cols=5):
+        """Return ``rows`` by ``cols`` top processes and emissions."""
+        t = np.argsort(np.abs(np.array(matrix.sum(axis=0)).ravel())
+            )[:-rows - 1:-1]
+        b = np.argsort(np.abs(np.array(matrix.sum(axis=1)).ravel())
+            )[:-cols - 1:-1]
+        r = []
+        for row, x in enumerate(b):
+            for col, y in enumerate(t):
+                if matrix[x, y] > 0:
+                    r.append((row, col, float(matrix[x, y])))
+        return r, b, t
+
+    def hinton_matrix(self, lca, rows=5, cols=5):
+        coo, b, t = self.top_coo_matrix(lca.characterized_inventory.data,
+            rows=rows, cols=cols)
+        rt, rb = lca.reverse_dict()
+        flows = [self.get_name(rb[x]) for x in b]
+        activities = [self.get_name(rt[x]) for x in t]
+        return {"results": coo, "total": lca.score, "xlabels": activities,
+            "ylabels": flows}
+
     def annotate(self, sorted_data, rev_mapping):
         """Reverse the mapping from database ids to array indices"""
         return [(row[0], rev_mapping[row[1]]) for row in sorted_data]
@@ -33,18 +56,42 @@ class ContributionAnalysis(object):
         """Return an array of [value, index] biosphere emissions."""
         return self.sort_array(np.array(matrix.sum(axis=1)).ravel(), **kwargs)
 
-    def annotated_top_processes(self, matrix, rev, **kwargs):
-        return [(score, self.get_name(rev[index])) for score, index in \
-            self.top_processes(matrix)]
+    def annotated_top_processes(self, lca, **kwargs):
+        rt, rb = lca.reverse_dict()
+        return [(score, self.get_name(rt[index])) for score, index in \
+            self.top_processes(lca.characterized_inventory.data)]
 
-    def annotated_top_emissions(self, matrix, rev, **kwargs):
-        return [(score, self.get_name(rev[index])) for score, index in \
-            self.top_emissions(matrix)]
+    def annotated_top_emissions(self, lca, **kwargs):
+        rt, rb = lca.reverse_dict()
+        return [(score, self.get_name(rb[index])) for score, index in \
+            self.top_emissions(lca.characterized_inventory.data)]
 
     def get_name(self, name):
         if name[0] not in self.db_names:
             self.db_names[name[0]] = Database(name[0]).load()
         return self.db_names[name[0]][name]["name"]
+
+    def gini_coefficient(self, matrix, total, limit=100):
+        """Calculate the Gini coefficient for the top ``limit`` contributing processes.
+
+        This is a measure of the relative importance of the top-scoring processes compared to other important processes."""
+        raise NotImplemented
+        data = self.top_processes(matrix, limit=limit)[::-1, 0]
+        expected = np.arange(1, limit + 1) / total
+
+    def concentration_ratio(self, matrix, total, limit=4):
+        """A measure of the concentration of LCA scores in the highest contributing processes.
+
+        The `concentration ration <http://en.wikipedia.org/wiki/Concentration_ratio>`_ ranges from 0 to 1, and is commonly calculated for 4 or 8 firms (processes)."""
+        return float(self.top_processes(matrix, limit=limit)[:, 0].sum() \
+            / total)
+
+    def herfindahl_index(self, matrix, total, limit=50):
+        """Another measure of the concentration of LCA scores in the highest contributing processes.
+
+        The normalized `Herfindahl index <http://en.wikipedia.org/wiki/Herfindahl_index>`_ ranges from 0 to 1, with 1 being representing a single process accounting for the complete LCA score."""
+        return float(((self.top_processes(matrix, limit=limit)[::-1, 0] \
+            / total) ** 2).sum() - 1 / limit) / (1 - 1 / limit)
 
     def d3_treemap(self, matrix, rev_bio, rev_techno, limit=0.025,
             limit_type="percent"):

@@ -113,7 +113,7 @@ Construct treemap input data structure for LCA result. Output like:
         total = np.abs(matrix).sum()
         processes = self.top_processes(matrix, limit=limit,
             limit_type=limit_type)
-        data = {"name": "LCA result", "children": []}
+        data = {"name": "LCA result", "children": [], "size": total}
         for dummy, tech_index in processes:
             name = self.get_name(rev_techno[tech_index])
             this_score = np.abs(matrix[:, tech_index].toarray().ravel()).sum()
@@ -129,7 +129,8 @@ Construct treemap input data structure for LCA result. Output like:
                     this_score - children_score})
             data["children"].append({
                 "name": name,
-                "children": children
+                "size": this_score,
+                # "children": children
                 })
         return data
 

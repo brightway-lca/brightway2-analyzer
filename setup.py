@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
   name='bw2analyzer',
-  version="0.1",
+  version="0.1.1",
   packages=["bw2analyzer"],
   author="Chris Mutel",
   author_email="cmutel@gmail.com",

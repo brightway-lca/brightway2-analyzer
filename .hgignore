@@ -4,3 +4,6 @@ dist
 *~
 MANIFEST
 *.sublime*
+cover
+.coverage
+bw2analyzer.egg-info

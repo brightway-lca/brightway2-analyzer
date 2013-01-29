@@ -65,8 +65,8 @@ class SerializedLCAReport(object):
         mc_data.sort()
         # Filter outliers
         offset = int(self.outliers * mc_data.shape[0])
-        lower = mc_data[int(0.025 * self.iterations)]
-        upper = mc_data[int(0.975 * self.iterations)]
+        lower = mc_data[int(0.015 * self.iterations)]
+        upper = mc_data[int(0.985 * self.iterations)]
         mc_data = mc_data[offset:-offset]
         num_bins = max(
             100,

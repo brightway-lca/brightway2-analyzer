@@ -51,8 +51,11 @@ class SerializedLCAReport(object):
                 "concentration": concentration
                 },
             "monte carlo": self.get_monte_carlo(),
-            "version": self.version,
-            "uuid": self.uuid
+            "metadata": {
+                "type": "Brightway2 serialized LCA report",
+                "version": self.version,
+                "uuid": self.uuid,
+                },
             }
 
     def get_monte_carlo(self):

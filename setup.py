@@ -7,7 +7,7 @@ setup(
   author="Chris Mutel",
   author_email="cmutel@gmail.com",
   license=open('LICENSE.txt').read(),
-  install_requires=["brightway2"],
+  install_requires=["brightway2", "scipy", "numpy", "requests"],
   long_description=open('README.rst').read(),
   classifiers=[
     'Development Status :: 4 - Beta',

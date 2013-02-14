@@ -2,10 +2,12 @@
 from __future__ import division
 from . import ContributionAnalysis
 from brightway2 import JsonWrapper, methods, config
-from bw2calc import ParallelMonteCarlo, LCA
+from bw2calc import ParallelMonteCarlo, LCA, node_pruner, GraphTraversal, \
+    edge_cutter, d3_fd_graph_formatter
 from scipy.stats import gaussian_kde
 import numpy as np
 import os
+import requests
 import uuid
 
 
@@ -23,6 +25,7 @@ class SerializedLCAReport(object):
         self.uuid = uuid.uuid4().hex
 
     def calculate(self):
+        """Calculate LCA report data"""
         lca = LCA(self.activity, self.method)
         lca.lci()
         lca.lcia()
@@ -50,6 +53,7 @@ class SerializedLCAReport(object):
                 "herfindahl": herfindahl,
                 "concentration": concentration
                 },
+            "force_directed": self.get_force_directed(),
             "monte carlo": self.get_monte_carlo(),
             "metadata": {
                 "type": "Brightway2 serialized LCA report",
@@ -59,6 +63,10 @@ class SerializedLCAReport(object):
             }
 
     def get_monte_carlo(self):
+        """Get Monte Carlo results"""
+        if not self.iterations:
+            # No Monte Carlo desired
+            return None
         mc_data = np.array(ParallelMonteCarlo(
             self.activity,
             self.method,
@@ -66,6 +74,9 @@ class SerializedLCAReport(object):
             cpus=self.cpus
             ).calculate())
         mc_data.sort()
+        if np.unique(mc_data).shape[0] == 1:
+            # No uncertainty in database
+            return None
         # Filter outliers
         offset = int(self.outliers * mc_data.shape[0])
         lower = mc_data[int(0.015 * self.iterations)]
@@ -97,7 +108,36 @@ class SerializedLCAReport(object):
                 }
             }
 
+    def get_force_directed(self):
+        """Get graph traversal results"""
+        gt = GraphTraversal()
+        traversal = gt.calculate(self.activity, self.method)
+        edges = edge_cutter(traversal["nodes"], traversal["edges"],
+            traversal["lca"].score, 0.01)
+        nodes = node_pruner(traversal["nodes"], edges)
+        return d3_fd_graph_formatter(nodes, edges, traversal["lca"].score)
+
     def write(self):
+        """Write report data to file"""
         dirpath = config.request_dir("reports")
         filepath = os.path.join(dirpath, "report.%s.json" % self.uuid)
         JsonWrapper.dump(self.report, filepath)
+
+    def upload(self):
+        """Upload report data if allowed"""
+        if not config.p.get("upload_reports", False) or not \
+                config.p.get("report_server_url", None):
+            raise ValueError("Report uploading not allowed")
+        url = config.p["report_server_url"]
+        if url[-1] != "/":
+            url += "/"
+        r = requests.post(url + "upload",
+            data=JsonWrapper.dumps(self.report),
+            headers={'content-type': 'application/json'}
+            )
+        if r.status_code == 200:
+            report_url = url + "report/" + self.uuid
+            self.report["metadata"]["online"] = report_url
+            return report_url
+        else:
+            return False

@@ -98,6 +98,8 @@ class ContributionAnalysis(object):
         """
 Construct treemap input data structure for LCA result. Output like:
 
+.. code-block:: python
+
     {
     "name": "LCA result",
     "children": [{
@@ -139,7 +141,7 @@ Construct treemap input data structure for LCA result. Output like:
     #         process = process.id
     #     if not hasattr(self.dicts, 'reverse'):
     #         self.construct_reverse_dicts()
-    #     return self._top(array(self.weighted_biosphere[:,process].todense( 
+    #     return self._top(array(self.weighted_biosphere[:,process].todense(
     #         )).ravel(), self.dicts.reverse.biosphere, **kwargs)
 
     # def top_processes_for_emission(self, biosphere_flow, **kwargs):
@@ -147,7 +149,7 @@ Construct treemap input data structure for LCA result. Output like:
     #         biosphere_flow = biosphere_flow.id
     #     if not hasattr(self.dicts, 'reverse'):
     #         self.construct_reverse_dicts()
-    #     return self._top(array(self.weighted_biosphere[biosphere_flow,: 
+    #     return self._top(array(self.weighted_biosphere[biosphere_flow,:
     #         ].todense()).ravel(), self.dicts.reverse.technosphere, **kwargs)
 
     # def top_processes_for_emission_inventory(self, emission, **kwargs):
@@ -156,5 +158,5 @@ Construct treemap input data structure for LCA result. Output like:
     #         emission = emission.id
     #     if not hasattr(self.dicts, 'reverse'):
     #         self.construct_reverse_dicts()
-    #     return self._top(array(self.calculated_biosphere[emission,:].todense( 
+    #     return self._top(array(self.calculated_biosphere[emission,:].todense(
     #         )).ravel(), self.dicts.reverse.technosphere, **kwargs)

@@ -7,3 +7,4 @@ MANIFEST
 cover
 .coverage
 bw2analyzer.egg-info
+docs/_build

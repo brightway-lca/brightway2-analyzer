@@ -22,37 +22,34 @@ class PageRank(object):
         return self.pr
 
     def page_rank(self, technosphere, alpha=0.85, max_iter=100, tol=1e-6):
-        """Return the PageRank of the nodes in the graph.
+        """
+Return the PageRank of the nodes in the graph.
 
-        Adapted from http://networkx.lanl.gov/svn/networkx/trunk/networkx/algorithms/link_analysis/pagerank_alg.py
+Adapted from http://networkx.lanl.gov/svn/networkx/trunk/networkx/algorithms/link_analysis/pagerank_alg.py
 
-        PageRank computes a ranking of the nodes in the graph G based on
-        the structure of the incoming links. It was originally designed as
-        an algorithm to rank web pages.
+PageRank computes a ranking of the nodes in the graph G based on
+the structure of the incoming links. It was originally designed as
+an algorithm to rank web pages.
 
-        Parameters
-        -----------
-        technosphere : The technosphere matrix (A sparse matrix)
-        alpha : float, optional. Damping parameter for PageRank, default=0.85
+The eigenvector calculation uses power iteration with a SciPy
+sparse matrix representation.
 
-        Returns
-        -------
-        nodes : dictionary
-           Dictionary of nodes (Process ids) with value as PageRank
+Args:
+    * *technosphere* (scipy sparse matrix): The technosphere matrix.
+    * *alpha* (float, optional): Damping parameter for PageRank, default=0.85
 
-        Notes
-        -----
-        The eigenvector calculation uses power iteration with a SciPy
-        sparse matrix representation.
+Returns:
+    * Dictionary of nodes (activity codes) with value as PageRank
 
-        References
-        ----------
-        .. [1] A. Langville and C. Meyer,
-           "A survey of eigenvector methods of web information retrieval."
-           http://citeseer.ist.psu.edu/713792.html
-        .. [2] Page, Lawrence; Brin, Sergey; Motwani, Rajeev and Winograd, Terry,
-           The PageRank citation ranking: Bringing order to the Web. 1999
-           http://dbpubs.stanford.edu:8090/pub/showDoc.Fulltext?lang=en&doc=1999-66&format=pdf
+
+References
+
+.. [1] A. Langville and C. Meyer,
+   "A survey of eigenvector methods of web information retrieval."
+   http://citeseer.ist.psu.edu/713792.html
+.. [2] Page, Lawrence; Brin, Sergey; Motwani, Rajeev and Winograd, Terry,
+   The PageRank citation ranking: Bringing order to the Web. 1999
+   http://dbpubs.stanford.edu:8090/pub/showDoc.Fulltext?lang=en&doc=1999-66&format=pdf
         """
         mat = technosphere.copy()
         (n, m) = mat.shape

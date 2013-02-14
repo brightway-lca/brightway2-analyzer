@@ -7,7 +7,7 @@ Brightway2-analyzer
 This is the technical documentation for Brightway2-analyzer, part of the `Brightway2 <http://brightwaylca.org>`_ life cycle assessment calculation framework. The following online resources are available:
 
 * `Source code <https://bitbucket.org/cmutel/brightway2-analyzer>`_
-* `Documentation on Read the Docs <http://bw2analyzer.readthedocs.org>`_
+* `Documentation on Read the Docs <https://bw2analyzer.readthedocs.org/en/latest/>`_
 * `Test coverage <http://coverage.brightwaylca.org/analyzer/index.html>`_
 
 Brightway2 is a new framework for life cycle assessment (LCA). Its focus is on efficient calculation and visualization.

@@ -2,3 +2,5 @@ brightway2
 numpy>=1.6
 requests
 scipy
+bw2calc>=0.9.0-alpha
+bw2data>=0.9.0-alpha

@@ -16,7 +16,7 @@ class PageRank(object):
         self.lca = LCA({self.process: 1})
         self.lca.lci()
         self.rev_dict, dummy = self.lca.reverse_dict()
-        self.matrix = self.lca.technosphere_matrix.data.transpose()
+        self.matrix = self.lca.technosphere_matrix.transpose()
         self.pr = [(x[0], self.rev_dict[x[1]]) for x in self.page_rank(
             self.matrix)]
         return self.pr

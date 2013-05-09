@@ -9,6 +9,7 @@ setup(
   license=open('LICENSE.txt').read(),
   install_requires=["brightway2", "scipy", "numpy", "requests"],
   long_description=open('README.rst').read(),
+  url="https://bitbucket.org/cmutel/brightway2-analyzer",
   classifiers=[
     'Development Status :: 4 - Beta',
     'Intended Audience :: End Users/Desktop',

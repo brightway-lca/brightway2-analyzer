@@ -76,8 +76,6 @@ class ContributionAnalysis(object):
 
         This is a measure of the relative importance of the top-scoring processes compared to other important processes."""
         raise NotImplemented
-        data = self.top_processes(matrix, limit=limit)[::-1, 0]
-        expected = np.arange(1, limit + 1) / total
 
     def concentration_ratio(self, matrix, total, limit=4):
         """A measure of the concentration of LCA scores in the highest contributing processes.

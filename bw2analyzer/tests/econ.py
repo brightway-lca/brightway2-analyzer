@@ -1,5 +1,6 @@
 from __future__ import division
-from ..econ import concentration_ratio, gini_coefficient, herfindahl_index
+from ..econ import concentration_ratio, gini_coefficient, herfindahl_index, \
+    theil_index
 import numpy as np
 import unittest
 
@@ -32,3 +33,11 @@ class EconometricsTestCase(unittest.TestCase):
         x = np.array((0.2, 0.3, 0.4, 0.5, 0.6))
         # From wikipedia page
         self.assertAlmostEqual(gini_coefficient(x), 0.2)
+
+    def test_theil(self):
+        # Include negative and zero values to test filtering
+        x = np.array((0., -2., 2., 6., 20.))
+        average = 30 / 4
+        y = np.array((2., 2., 6., 20.))
+        answer = 1 / 4 * ((y / average) * np.log(y / average)).sum()
+        self.assertAlmostEqual(float(answer), theil_index(x))

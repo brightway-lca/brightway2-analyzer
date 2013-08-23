@@ -45,13 +45,10 @@ def herfindahl_index(x, normalize=True):
 
     """
     # Normalize so that total is 1
-    print x
     x = np.array(x) / np.sum(x)
-    print x
     index = (x ** 2).sum()
     if normalize:
         correction = 1 / (x != 0).sum()
-        print index, correction
         index = (index - correction) / (1 - correction)
     return float(index)
 
@@ -77,3 +74,24 @@ def concentration_ratio(x, number=4):
     x.sort()
     return float(x[-number:].sum())
 
+
+def theil_index(x):
+    """
+    Return Theil index.
+
+    See http://en.wikipedia.org/wiki/Theil_Index
+
+    The Theil index is a measure of economic inequality based on information theory. It is the difference between a dataset's maximum possible entropy and observed entropy.
+
+    Args:
+        *x* (list or array): Data
+
+    Returns:
+        Theil index (float)
+
+    """
+    x = np.array(x).copy()
+    # Have to filter values because of log transform
+    x = np.abs(x[x != 0])
+    average, n = np.average(x), x.shape[0]
+    return float(1 / n * ((x / average) * np.log(x / average)).sum())

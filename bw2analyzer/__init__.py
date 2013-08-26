@@ -4,4 +4,4 @@ from .page_rank import PageRank
 from .explorer import DatabaseExplorer
 from .report import SerializedLCAReport
 
-__version__ = (0, 3, 2)
+__version__ = (0, 3, 3)

@@ -1,7 +1,7 @@
 from __future__ import division
 from time import time
 from bw2calc import LCA
-from bw2data import Database, methods, databases, mapping
+from bw2data import Database, methods, databases, mapping, Method
 import numpy as np
 import progressbar
 
@@ -75,3 +75,40 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
 
     lca.fix_dictionaries()
     return results, lca.technosphere_dict, time() - start
+
+
+def group_by_emissions(method):
+    """Group characterization factors by name and unit.
+
+    Does not work on regionalized LCIA methods!
+
+    Args:
+        *method* (tuple or Method): LCIA method
+
+    Returns:
+        Dictionary: {(name, unit)}: [cfs... ]
+
+    """
+    if isinstance(method, Method):
+        data = method.load()
+    elif isinstance(method, tuple):
+        data = Method(method).load()
+    else:
+        raise ValueError("Can't interpret %s as a LCIA method" % method)
+
+    biosphere = Database("biosphere").load()
+    grouped = {}
+
+    for key, cf, geo in data:
+        if geo != "GLO":
+            raise ValueError(
+                "`group_by_emissions` doesn't work on regionalized methods"
+            )
+        if key[0] != "biosphere":
+            # Alternative biosphere, e.g. Ecoinvent 3. Add new biosphere DB
+            biosphere.update(**Database(key[0]).load())
+        flow = biosphere[key]
+        label = (flow["name"], flow["unit"])
+        grouped.setdefault(label, []).append(cf)
+
+    return grouped

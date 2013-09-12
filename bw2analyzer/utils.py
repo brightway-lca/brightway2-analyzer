@@ -78,7 +78,9 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
 
 
 def group_by_emissions(method):
-    """Group characterization factors by name and unit.
+    """Group characterization factors by name, realm, and unit.
+
+    **realm** is the general category, e.g. air, soil, water.
 
     Does not work on regionalized LCIA methods!
 
@@ -86,7 +88,7 @@ def group_by_emissions(method):
         *method* (tuple or Method): LCIA method
 
     Returns:
-        Dictionary: {(name, unit)}: [cfs... ]
+        Dictionary: {(name, realm, unit)}: [cfs... ]
 
     """
     if isinstance(method, Method):
@@ -108,7 +110,7 @@ def group_by_emissions(method):
             # Alternative biosphere, e.g. Ecoinvent 3. Add new biosphere DB
             biosphere.update(**Database(key[0]).load())
         flow = biosphere[key]
-        label = (flow["name"], flow["unit"])
+        label = (flow["name"], flow.get("categories", [""])[0], flow["unit"])
         grouped.setdefault(label, []).append(cf)
 
     return grouped

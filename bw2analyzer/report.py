@@ -29,15 +29,16 @@ class SerializedLCAReport(object):
         lca = LCA(self.activity, self.method)
         lca.lci()
         lca.lcia()
+        lca.fix_dictionaries()
         rt, rb = lca.reverse_dict()
 
         ca = ContributionAnalysis()
         hinton = ca.hinton_matrix(lca)
-        treemap = ca.d3_treemap(lca.characterized_inventory.data, rb, rt)
+        treemap = ca.d3_treemap(lca.characterized_inventory, rb, rt)
         herfindahl = ca.herfindahl_index(
-            lca.characterized_inventory.data, lca.score)
+            lca.characterized_inventory, lca.score)
         concentration = ca.concentration_ratio(
-            lca.characterized_inventory.data, lca.score)
+            lca.characterized_inventory, lca.score)
 
         self.report = {
             "activity": [(ca.get_name(k), "%.2g" % v, ca.db_names[k[0]][k][

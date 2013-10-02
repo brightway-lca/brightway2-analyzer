@@ -36,7 +36,7 @@ class ContributionAnalysis(object):
         return r, b, t
 
     def hinton_matrix(self, lca, rows=5, cols=5):
-        coo, b, t = self.top_coo_matrix(lca.characterized_inventory.data,
+        coo, b, t = self.top_coo_matrix(lca.characterized_inventory,
             rows=rows, cols=cols)
         rt, rb = lca.reverse_dict()
         flows = [self.get_name(rb[x]) for x in b]
@@ -59,12 +59,12 @@ class ContributionAnalysis(object):
     def annotated_top_processes(self, lca, **kwargs):
         rt, rb = lca.reverse_dict()
         return [(score, self.get_name(rt[index])) for score, index in \
-            self.top_processes(lca.characterized_inventory.data)]
+            self.top_processes(lca.characterized_inventory)]
 
     def annotated_top_emissions(self, lca, **kwargs):
         rt, rb = lca.reverse_dict()
         return [(score, self.get_name(rb[index])) for score, index in \
-            self.top_emissions(lca.characterized_inventory.data)]
+            self.top_emissions(lca.characterized_inventory)]
 
     def get_name(self, name):
         if name[0] not in self.db_names:

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
-from . import ContributionAnalysis
+from . import ContributionAnalysis, GTManipulator
 from brightway2 import JsonWrapper, methods, config
-from bw2calc import ParallelMonteCarlo, LCA, node_pruner, GraphTraversal, \
-    edge_cutter, d3_fd_graph_formatter
+from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
 from scipy.stats import gaussian_kde
 import numpy as np
 import os
@@ -113,10 +112,13 @@ class SerializedLCAReport(object):
         """Get graph traversal results"""
         gt = GraphTraversal()
         traversal = gt.calculate(self.activity, self.method)
-        edges = edge_cutter(traversal["nodes"], traversal["edges"],
-            traversal["lca"].score, 0.01)
-        nodes = node_pruner(traversal["nodes"], edges)
-        return d3_fd_graph_formatter(nodes, edges, traversal["lca"].score)
+        nodes, edges = GTManipulator.simplify_naive(
+            traversal['nodes'],
+            traversal['edges'],
+            traversal['lca'].score
+        )
+        nodes = GTManipulator.add_metadata(nodes, traversal['lca'])
+        return GTManipulator.reformat_d3(nodes, edges, traversal['lca'].score)
 
     def write(self):
         """Write report data to file"""

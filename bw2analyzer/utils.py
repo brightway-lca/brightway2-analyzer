@@ -1,7 +1,7 @@
 from __future__ import division
 from time import time
 from bw2calc import LCA
-from bw2data import Database, methods, databases, mapping, Method
+from bw2data import Database, methods, databases, mapping, Method, config
 import numpy as np
 import progressbar
 
@@ -98,7 +98,7 @@ def group_by_emissions(method):
     else:
         raise ValueError("Can't interpret %s as a LCIA method" % method)
 
-    biosphere = Database("biosphere").load()
+    biosphere = Database(config.biosphere).load()
     grouped = {}
 
     for key, cf, geo in data:

@@ -7,14 +7,14 @@ class GroupingTest(BW2DataTest):
     def test_grouping_together(self):
         biosphere_data = {
             ("biosphere", 1): {
-                'categories': ['this'],
+                'categories': ['air', 'this'],
                 'exchanges': [],
                 'name': 'some bad stuff',
                 'type': 'emission',
                 'unit': 'kg'
                 },
             ("biosphere", 2): {
-                'categories': ['that'],
+                'categories': ['air', 'that'],
                 'exchanges': [],
                 'name': 'some bad stuff',
                 'type': 'emission',
@@ -34,21 +34,21 @@ class GroupingTest(BW2DataTest):
         ])
 
         answer = {
-            ('some bad stuff', 'kilogram'): [1.0, 1.0]
+            ('some bad stuff', 'air', 'kilogram'): [1.0, 1.0]
         }
         self.assertEquals(group_by_emissions(method), answer)
 
     def test_grouping_separate_name(self):
         biosphere_data = {
             ("biosphere", 1): {
-                'categories': ['this'],
+                'categories': ['s', 'this'],
                 'exchanges': [],
                 'name': 'some bad stuff',
                 'type': 'emission',
                 'unit': 'kg'
                 },
             ("biosphere", 2): {
-                'categories': ['that'],
+                'categories': ['s', 'that'],
                 'exchanges': [],
                 'name': 'some more bad stuff',
                 'type': 'emission',
@@ -68,22 +68,22 @@ class GroupingTest(BW2DataTest):
         ])
 
         answer = {
-            ('some bad stuff', 'kilogram'): [1.0],
-            ('some more bad stuff', 'kilogram'): [2.0]
+            ('some bad stuff', 's', 'kilogram'): [1.0],
+            ('some more bad stuff', 's', 'kilogram'): [2.0]
         }
         self.assertEquals(group_by_emissions(method), answer)
 
     def test_grouping_separate_unit(self):
         biosphere_data = {
             ("biosphere", 1): {
-                'categories': ['this'],
+                'categories': ['foo', 'this'],
                 'exchanges': [],
                 'name': 'some bad stuff',
                 'type': 'emission',
                 'unit': 'kg'
                 },
             ("biosphere", 2): {
-                'categories': ['that'],
+                'categories': ['foo', 'that'],
                 'exchanges': [],
                 'name': 'some bad stuff',
                 'type': 'emission',
@@ -103,7 +103,7 @@ class GroupingTest(BW2DataTest):
         ])
 
         answer = {
-            ('some bad stuff', 'kilogram'): [1.0],
-            ('some bad stuff', 'tonne'): [2.0]
+            ('some bad stuff', 'foo', 'kilogram'): [1.0],
+            ('some bad stuff', 'foo', 'tonne'): [2.0]
         }
         self.assertEquals(group_by_emissions(method), answer)

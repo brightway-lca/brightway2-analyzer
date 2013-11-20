@@ -3,7 +3,7 @@ from bw2data import Database, Method
 from ..utils import group_by_emissions
 
 
-class GroupingTest(BW2DataTest):
+class GroupingTestCase(BW2DataTest):
     def test_grouping_together(self):
         biosphere_data = {
             ("biosphere", 1): {

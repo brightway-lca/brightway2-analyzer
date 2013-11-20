@@ -9,35 +9,104 @@ class ContributionAnalysis(object):
         self.db_names = {}
 
     def sort_array(self, data, limit=25, limit_type="number", total=None):
-        """Common sorting function for all top methods."""
+        """
+Common sorting function for all ``top`` methods. Sorts by highest value first.
+
+Operates in either ``number`` or ``percent`` mode. In ``number`` mode, return ``limit`` values. In ``percent`` mode, return all values >= (total * limit); where ``0 < limit <= 1``.
+
+Returns 2-d numpy array of sorted values and row indices, e.g.:
+
+.. code-block:: python
+
+    ContributionAnalysis().sort_array((1., 3., 2.))
+
+returns
+
+.. code-block:: python
+
+    (
+        (3, 1),
+        (2, 2),
+        (1, 0)
+    )
+
+Args:
+    * *data* (numpy array): A 1-d array of values to sort.
+    * *limit* (number, default=25): Number of values to return, or percentage cutoff.
+    * *limit_type* (str, default=``number``): Either ``number`` or ``percent``.
+    * *total* (number, default=None): Optional specification of summed data total.
+
+Returns:
+    2-d numpy array of values and row indices.
+
+        """
         total = total or np.abs(data).sum()
         if limit_type not in ("number", "percent"):
             raise ValueError("limit_type must be either 'percent' or 'index'.")
         if limit_type == "percent":
-            if 0 <= limit >= 1:
-                raise ValueError("Percentage limits must be between 0 and 1.")
-            limit = (data > (total * limit)).sum()
+            if not 0 < limit <= 1:
+                raise ValueError("Percentage limits > 0 and <= 1.")
+            limit = (data >= (total * limit)).sum()
 
         results = np.hstack((data.reshape((-1, 1)),
             np.arange(data.shape[0]).reshape((-1, 1))))
         return results[np.argsort(np.abs(data))[::-1]][:limit, :]
 
-    def top_coo_matrix(self, matrix, rows=5, cols=5):
-        """Return ``rows`` by ``cols`` top processes and emissions."""
-        t = np.argsort(np.abs(np.array(matrix.sum(axis=0)).ravel())
+    def top_matrix(self, matrix, rows=5, cols=5):
+        """
+Find most important (i.e. highest summed) rows and columns in a matrix, as well as the most corresponding non-zero individual elements in the top rows and columns.
+
+Only returns matrix values which are in the top rows and columns. Element values are returned as a tuple: ``(row, col, row index in top rows, col index in top cols, value)``.
+
+Example:
+
+.. code-block:: python
+
+    matrix = [
+        [0, 0, 1, 0],
+        [2, 0, 4, 0],
+        [3, 0, 1, 1],
+        [0, 7, 0, 1],
+    ]
+
+In this matrix, the row sums are ``(1, 6, 5, 8)``, and the columns sums are ``(5, 7, 6, 2)``. Therefore, the top rows are ``(3, 1)`` and the top columns are ``(1, 2)``. The result would therefore be:
+
+.. code-block:: python
+
+    (
+        (
+            (3, 1, 0, 0, 7),
+            (3, 2, 0, 1, 1),
+            (1, 2, 1, 1, 4)
+        ),
+        (3, 1),
+        (1, 2)
+    )
+
+Args:
+    * *matrix* (array or matrix): Any Python object that supports the ``.sum(axis=)`` syntax.
+    * *rows* (int): Number of rows to select.
+    * *cols* (int): Number of columns to select.
+
+Returns:
+    (elements, top rows, top columns)
+
+"""
+        top_rows = np.argsort(np.abs(np.array(matrix.sum(axis=1)).ravel())
             )[:-rows - 1:-1]
-        b = np.argsort(np.abs(np.array(matrix.sum(axis=1)).ravel())
+        top_cols = np.argsort(np.abs(np.array(matrix.sum(axis=0)).ravel())
             )[:-cols - 1:-1]
-        r = []
-        for row, x in enumerate(b):
-            for col, y in enumerate(t):
-                if matrix[x, y] > 0:
-                    r.append((row, col, float(matrix[x, y])))
-        return r, b, t
+        elements = []
+        for row, x in enumerate(top_rows):
+            for col, y in enumerate(top_cols):
+                if matrix[x, y] != 0:
+                    elements.append((x, y, row, col, float(matrix[x, y])))
+        return elements, top_rows, top_cols
 
     def hinton_matrix(self, lca, rows=5, cols=5):
-        coo, b, t = self.top_coo_matrix(lca.characterized_inventory,
+        coo, b, t = self.top_matrix(lca.characterized_inventory,
             rows=rows, cols=cols)
+        coo = [row[2:] for row in coo]  # Don't need matrix indices
         rt, rb = lca.reverse_dict()
         flows = [self.get_name(rb[x]) for x in b]
         activities = [self.get_name(rt[x]) for x in t]
@@ -70,26 +139,6 @@ class ContributionAnalysis(object):
         if name[0] not in self.db_names:
             self.db_names[name[0]] = Database(name[0]).load()
         return self.db_names[name[0]][name]["name"]
-
-    def gini_coefficient(self, matrix, total, limit=100):
-        """Calculate the Gini coefficient for the top ``limit`` contributing processes.
-
-        This is a measure of the relative importance of the top-scoring processes compared to other important processes."""
-        raise NotImplemented
-
-    def concentration_ratio(self, matrix, total, limit=4):
-        """A measure of the concentration of LCA scores in the highest contributing processes.
-
-        The `concentration ration <http://en.wikipedia.org/wiki/Concentration_ratio>`_ ranges from 0 to 1, and is commonly calculated for 4 or 8 firms (processes)."""
-        return float(self.top_processes(matrix, limit=limit)[:, 0].sum() \
-            / total)
-
-    def herfindahl_index(self, matrix, total, limit=50):
-        """Another measure of the concentration of LCA scores in the highest contributing processes.
-
-        The normalized `Herfindahl index <http://en.wikipedia.org/wiki/Herfindahl_index>`_ ranges from 0 to 1, with 1 being representing a single process accounting for the complete LCA score."""
-        return float(((self.top_processes(matrix, limit=limit)[::-1, 0] \
-            / total) ** 2).sum() - 1 / limit) / (1 - 1 / limit)
 
     def d3_treemap(self, matrix, rev_bio, rev_techno, limit=0.025,
             limit_type="percent"):

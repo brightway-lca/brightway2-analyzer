@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 from . import ContributionAnalysis, GTManipulator
+from .econ import herfindahl_index, concentration_ratio
 from brightway2 import JsonWrapper, methods, config
 from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
 from scipy.stats import gaussian_kde
@@ -12,7 +13,7 @@ import uuid
 
 class SerializedLCAReport(object):
     """A complete LCA report (i.e. LCA score, Monte Carlo uncertainty analysis, contribution analysis) that can be serialized to a defined standard."""
-    version = 1
+    version = 2
 
     def __init__(self, activity, method, iterations=10000, cpus=None,
             outliers=0.025):
@@ -31,13 +32,13 @@ class SerializedLCAReport(object):
         lca.fix_dictionaries()
         rt, rb = lca.reverse_dict()
 
+        gt = GraphTraversal().calculate(self.activity, method=self.method)
+        force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
         ca = ContributionAnalysis()
         hinton = ca.hinton_matrix(lca)
-        treemap = ca.d3_treemap(lca.characterized_inventory, rb, rt)
-        herfindahl = ca.herfindahl_index(
-            lca.characterized_inventory, lca.score)
-        concentration = ca.concentration_ratio(
-            lca.characterized_inventory, lca.score)
+        treemap = self.get_treemap(gt['nodes'], gt['edges'], lca)
+        herfindahl = herfindahl_index(lca.characterized_inventory.data)
+        concentration = concentration_ratio(lca.characterized_inventory.data)
 
         self.report = {
             "activity": [(ca.get_name(k), "%.2g" % v, ca.db_names[k[0]][k][
@@ -53,7 +54,7 @@ class SerializedLCAReport(object):
                 "herfindahl": herfindahl,
                 "concentration": concentration
                 },
-            "force_directed": self.get_force_directed(),
+            "force_directed": force_directed,
             "monte carlo": self.get_monte_carlo(),
             "metadata": {
                 "type": "Brightway2 serialized LCA report",
@@ -61,6 +62,12 @@ class SerializedLCAReport(object):
                 "uuid": self.uuid,
                 },
             }
+
+    def get_treemap(self, nodes, edges, lca, unroll_cutoff=0.01,
+                simplify_limit=0.1):
+        nodes, edges, links = GTManipulator.unroll_graph(nodes, edges, lca.score, cutoff=unroll_cutoff)
+        nodes, edges = GTManipulator.simplify(nodes, edges, lca.score, limit=simplify_limit)
+        return GTManipulator.d3_treemap(nodes, edges, lca)
 
     def get_monte_carlo(self):
         """Get Monte Carlo results"""
@@ -73,6 +80,7 @@ class SerializedLCAReport(object):
             iterations=self.iterations,
             cpus=self.cpus
             ).calculate())
+        # mc_data = np.random.lognormal(size=self.iterations)
         mc_data.sort()
         if np.unique(mc_data).shape[0] == 1:
             # No uncertainty in database
@@ -108,17 +116,15 @@ class SerializedLCAReport(object):
                 }
             }
 
-    def get_force_directed(self):
+    def get_force_directed(self, nodes, edges, lca):
         """Get graph traversal results"""
-        gt = GraphTraversal()
-        traversal = gt.calculate(self.activity, self.method)
         nodes, edges = GTManipulator.simplify_naive(
-            traversal['nodes'],
-            traversal['edges'],
-            traversal['lca'].score
+            nodes,
+            edges,
+            lca.score
         )
-        nodes = GTManipulator.add_metadata(nodes, traversal['lca'])
-        return GTManipulator.reformat_d3(nodes, edges, traversal['lca'].score)
+        nodes = GTManipulator.add_metadata(nodes, lca)
+        return GTManipulator.d3_force_directed(nodes, edges, lca.score)
 
     def write(self):
         """Write report data to file"""

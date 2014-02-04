@@ -1,6 +1,6 @@
 numpy>=1.6
 requests>=1.1.0
 scipy
-brightway2>=0.10
-bw2calc>=0.10.1
-bw2data>=0.10.1
+brightway2
+bw2calc
+bw2data

@@ -46,11 +46,9 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
 
     if progress:
         widgets = [
-            'Datasets: ',
-            progressbar.Percentage(),
-            ' ',
-            progressbar.Bar(marker=progressbar.RotatingMarker()),
-            ' ',
+            progressbar.SimpleProgress(sep="/"), " (",
+            progressbar.Percentage(), ') ',
+            progressbar.Bar(marker=progressbar.RotatingMarker()), ' ',
             progressbar.ETA()
         ]
         pbar = progressbar.ProgressBar(
@@ -102,11 +100,11 @@ def group_by_emissions(method):
     grouped = {}
 
     for key, cf, geo in data:
-        if geo != "GLO":
+        if geo != config.global_location:
             raise ValueError(
                 "`group_by_emissions` doesn't work on regionalized methods"
             )
-        if key[0] != "biosphere":
+        if key[0] != config.biosphere:
             # Alternative biosphere, e.g. Ecoinvent 3. Add new biosphere DB
             biosphere.update(**Database(key[0]).load())
         flow = biosphere[key]

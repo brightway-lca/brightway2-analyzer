@@ -1,7 +1,7 @@
 import copy
 import itertools
 from heapq import heappush, heappop
-from bw2data import Database
+from bw2data import Database, config
 
 
 def tupify(o):
@@ -188,14 +188,16 @@ class GTManipulator(object):
 
         child_nodes = lambda node, edges: [e['from'] for e in edges if e['to'] == node]
 
+        counter = itertools.count(1)
+
         def format_node(node_key, node_data, rt):
             if node_key == -1:
                 return {
                     'name': 'Functional unit',
                     'unit': 'unit',
-                    'location': 'GLO',
+                    'location': config.global_location,
                     'categories': "",
-                    'id': node_key,
+                    'id': counter.next(),
                     'amount': 1.
                 }
 
@@ -208,7 +210,7 @@ class GTManipulator(object):
                 'unit': ds['unit'],
                 'location': ds['location'],
                 'categories': ", ".join(ds['categories']),
-                'id': node_key,
+                'id': counter.next(),
                 'amount': node_data['amount']
             }
 

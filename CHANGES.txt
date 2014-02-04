@@ -4,3 +4,4 @@ Changelog
 0.5 (2014-01-29)
 ================
 
+- CHANGE: Compatibility fixes with bw2data 0.12 and bw2calc 0.11

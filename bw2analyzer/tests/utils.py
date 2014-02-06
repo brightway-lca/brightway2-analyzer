@@ -23,11 +23,11 @@ class GroupingTestCase(BW2DataTest):
         }
 
         biosphere = Database("biosphere")
-        biosphere.register("Tests", [], len(biosphere_data))
+        biosphere.register(name="Tests", depends=[])
         biosphere.write(biosphere_data)
 
         method = Method(("test", "LCIA", "method"))
-        method.register("points", "w00t", 2)
+        method.register(unit="points")
         method.write([
             (("biosphere", 1), 1.0, "GLO"),
             (("biosphere", 2), 1.0, "GLO")
@@ -57,11 +57,11 @@ class GroupingTestCase(BW2DataTest):
         }
 
         biosphere = Database("biosphere")
-        biosphere.register("Tests", [], len(biosphere_data))
+        biosphere.register(name="Tests", depends=[])
         biosphere.write(biosphere_data)
 
         method = Method(("test", "LCIA", "method"))
-        method.register("points", "w00t", 2)
+        method.register(unit="points")
         method.write([
             (("biosphere", 1), 1.0, "GLO"),
             (("biosphere", 2), 2.0, "GLO")
@@ -92,11 +92,11 @@ class GroupingTestCase(BW2DataTest):
         }
 
         biosphere = Database("biosphere")
-        biosphere.register("Tests", [], len(biosphere_data))
+        biosphere.register(name="Tests", depends=[])
         biosphere.write(biosphere_data)
 
         method = Method(("test", "LCIA", "method"))
-        method.register("points", "w00t", 2)
+        method.register(unit="points")
         method.write([
             (("biosphere", 1), 1.0, "GLO"),
             (("biosphere", 2), 2.0, "GLO")

@@ -197,7 +197,7 @@ class MetadataTestCase(BW2DataTest):
                 }
         }
         d = Database("A")
-        d.register("Tests", [], len(data))
+        d.register(name="Tests", depends=[])
         d.write(data)
         self.assertEqual(len(databases), 1)
 

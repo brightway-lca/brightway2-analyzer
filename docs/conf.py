@@ -15,7 +15,7 @@
 # The short X.Y version.
 version = '0.5'
 # The full version, including alpha/beta/rc tags.
-release = '0.5'
+release = '0.5.1'
 
 # All configuration values have a default; values that are commented out
 # serve to show the default.

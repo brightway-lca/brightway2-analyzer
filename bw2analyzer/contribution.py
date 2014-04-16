@@ -126,11 +126,15 @@ Returns:
         return self.sort_array(np.array(matrix.sum(axis=1)).ravel(), **kwargs)
 
     def annotated_top_processes(self, lca, **kwargs):
+        if lca._mapped_dict:
+            lca.fix_dictionaries()
         rt, rb = lca.reverse_dict()
         return [(score, self.get_name(rt[index])) for score, index in \
             self.top_processes(lca.characterized_inventory)]
 
     def annotated_top_emissions(self, lca, **kwargs):
+        if lca._mapped_dict:
+            lca.fix_dictionaries()
         rt, rb = lca.reverse_dict()
         return [(score, self.get_name(rb[index])) for score, index in \
             self.top_emissions(lca.characterized_inventory)]

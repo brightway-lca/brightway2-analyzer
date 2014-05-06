@@ -92,7 +92,7 @@ class GTManipulator(object):
                 ds = Database(code[0]).load()[code]
                 new_value.update({
                     'name': ds['name'],
-                    'categories': ds['categories'],
+                    'categories': ds.get('categories', []),
                     'unit': ds['unit'],
                     'key': code
                 })

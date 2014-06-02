@@ -77,7 +77,7 @@ def concentration_ratio(x, number=4):
 
 def theil_index(x):
     """
-    Return Theil index.
+    Return Theil entropy index.
 
     See http://en.wikipedia.org/wiki/Theil_Index
 

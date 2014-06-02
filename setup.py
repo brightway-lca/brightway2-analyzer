@@ -7,7 +7,12 @@ setup(
     author="Chris Mutel",
     author_email="cmutel@gmail.com",
     license=open('LICENSE.txt').read(),
-    install_requires=["brightway2", "scipy", "numpy", "requests"],
+    install_requires=[
+        "brightway2",
+        "numpy",
+        "requests"
+        "scipy",
+    ],
     long_description=open('README.rst').read(),
     url="https://bitbucket.org/cmutel/brightway2-analyzer",
     classifiers=[

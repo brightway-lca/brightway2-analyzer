@@ -19,10 +19,14 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         Total elapsed time in seconds
 
     """
-    def get_normalized_scores(lca):
-        scores = np.abs(np.array(
-            lca.characterized_inventory.sum(axis=0)
-        ).ravel())
+    def get_normalized_scores(lca, kind):
+        if kind == "activities":
+            data = lca.characterized_inventory.sum(axis=0)
+        elif kind == "flows":
+            data = lca.characterized_inventory.sum(axis=1)
+        elif kind == "all":
+            data = lca.characterized_inventory.data
+        scores = np.abs(np.array(data).ravel())
         summed = scores.sum()
         if summed == 0:
             return np.zeros(scores.shape)
@@ -44,6 +48,16 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
     lca.decompose_technosphere()
     lca.lcia()
 
+    rows = lca.characterized_inventory.shape[0]
+    cols = lca.characterized_inventory.shape[1]
+    all_cutoff = cols * 4
+
+    results = {
+        'activities': np.zeros((cols, cols), dtype=np.float32),
+        'flows': np.zeros((rows, cols), dtype=np.float32),
+        'all': np.zeros((all_cutoff, cols), dtype=np.float32)
+    }
+
     if progress:
         widgets = [
             progressbar.SimpleProgress(sep="/"), " (",
@@ -59,12 +73,19 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
     # Actual calculations
     for index, key in enumerate(keys):
         lca.redo_lcia({key: 1})
+        if lca.score == 0.:
+            continue
+
         col = lca.technosphere_dict[mapping[key]]
-        try:
-            results[:, col] = get_normalized_scores(lca)
-        except:
-            # LCA score is zero
-            pass
+        results['activities'][:, col] = get_normalized_scores(lca, 'activities')
+        results['flows'][:, col] = get_normalized_scores(lca, 'flows')
+        results_all = get_normalized_scores(lca, 'all')
+        results_all.sort()
+        results_all = results_all[::-1]
+        fill_number = results_all.shape[0]
+        assert fill_number < all_cutoff, "Too many values in 'all'"
+        results['all'][:fill_number, col] = results_all
+
         if progress:
             pbar.update(index)
 

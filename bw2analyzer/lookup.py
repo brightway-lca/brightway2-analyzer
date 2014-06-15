@@ -17,7 +17,7 @@ class ParameterFinder(object):
         outp = self.rt[col]
         outp_data = Database(outp[0]).load()[outp]
         try:
-            exc = [x for x in outp_data['exchanges'] if x['input'] == inp][0]
+            exc = [x for x in outp_data.get("exchanges", []) if x['input'] == inp][0]
         except IndexError:
             raise ValueError("Can't find this exchange")
         return {
@@ -38,7 +38,7 @@ class ParameterFinder(object):
         outp = self.rt[col]
         outp_data = Database(outp[0]).load()[outp]
         try:
-            exc = [x for x in outp_data['exchanges'] if x['input'] == inp][0]
+            exc = [x for x in outp_data.get("exchanges", []) if x['input'] == inp][0]
         except IndexError:
             raise ValueError("Can't find this exchange")
         return {

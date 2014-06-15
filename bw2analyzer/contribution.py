@@ -139,10 +139,10 @@ Returns:
         return [(score, self.get_name(rb[index])) for score, index in \
             self.top_emissions(lca.characterized_inventory)]
 
-    def get_name(self, name):
-        if name[0] not in self.db_names:
-            self.db_names[name[0]] = Database(name[0]).load()
-        return self.db_names[name[0]][name]["name"]
+    def get_name(self, key):
+        if key[0] not in self.db_names:
+            self.db_names[key[0]] = Database(key[0]).load()
+        return self.db_names[key[0]][key].get("name", "Unknown")
 
     def d3_treemap(self, matrix, rev_bio, rev_techno, limit=0.025,
             limit_type="percent"):

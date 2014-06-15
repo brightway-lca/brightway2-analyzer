@@ -91,9 +91,9 @@ class GTManipulator(object):
                 code = rt[index]
                 ds = Database(code[0]).load()[code]
                 new_value.update({
-                    'name': ds['name'],
+                    'name': ds.get('name', "Unknown"),
                     'categories': ds.get('categories', []),
-                    'unit': ds['unit'],
+                    'unit': ds.get('unit', "Unknown"),
                     'key': code
                 })
             new_nodes[key] = new_value
@@ -206,10 +206,10 @@ class GTManipulator(object):
             key = rt[node_key]
             ds = Database(key[0]).load()[key]
             return {
-                'name': ds['name'],
-                'unit': ds['unit'],
-                'location': ds['location'],
-                'categories': ", ".join(ds['categories']),
+                'name': ds.get('name', "Unknown"),
+                'unit': ds.get('unit', "Unknown"),
+                'location': ds.get('location', "Unknown"),
+                'categories': ", ".join(ds.get('categories', [])),
                 'id': counter.next(),
                 'amount': node_data['amount']
             }

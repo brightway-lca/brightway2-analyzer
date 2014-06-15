@@ -129,7 +129,11 @@ def group_by_emissions(method):
             # Alternative biosphere, e.g. Ecoinvent 3. Add new biosphere DB
             biosphere.update(**Database(key[0]).load())
         flow = biosphere[key]
-        label = (flow["name"], flow.get("categories", [""])[0], flow["unit"])
+        label = (
+            flow.get("name", "Unknown"),
+            flow.get("categories", [""])[0],
+            flow.get("unit", "Unknown")
+        )
         grouped.setdefault(label, []).append(cf)
 
     return grouped

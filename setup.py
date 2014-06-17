@@ -10,7 +10,7 @@ setup(
     install_requires=[
         "brightway2",
         "numpy",
-        "requests"
+        "requests",
         "scipy",
     ],
     long_description=open('README.rst').read(),

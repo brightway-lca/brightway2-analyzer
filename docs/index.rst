@@ -1,6 +1,3 @@
-.. bw2analyzer documentation master file, created by
-   sphinx-quickstart on Thu Feb 14 17:07:34 2013.
-
 Brightway2-analyzer
 ===================
 

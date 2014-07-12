@@ -39,6 +39,7 @@ class SerializedLCAReport(object):
         treemap = self.get_treemap(gt['nodes'], gt['edges'], lca)
         herfindahl = herfindahl_index(lca.characterized_inventory.data)
         concentration = concentration_ratio(lca.characterized_inventory.data)
+        # monte_carlo = self.get_monte_carlo()
 
         self.report = {
             "activity": [(ca.get_name(k), "%.2g" % v, ca.db_names[k[0]][k][
@@ -55,7 +56,7 @@ class SerializedLCAReport(object):
                 "concentration": concentration
                 },
             "force_directed": force_directed,
-            "monte carlo": self.get_monte_carlo(),
+            "monte carlo": None,
             "metadata": {
                 "type": "Brightway2 serialized LCA report",
                 "version": self.version,
@@ -71,6 +72,7 @@ class SerializedLCAReport(object):
 
     def get_monte_carlo(self):
         """Get Monte Carlo results"""
+        print "Entered get_monte_carlo"
         if not self.iterations:
             # No Monte Carlo desired
             return None
@@ -80,25 +82,28 @@ class SerializedLCAReport(object):
             iterations=self.iterations,
             cpus=self.cpus
             ).calculate())
-        # mc_data = np.random.lognormal(size=self.iterations)
+        print "Finished MC .calculate(); Sorting"
         mc_data.sort()
         if np.unique(mc_data).shape[0] == 1:
             # No uncertainty in database
             return None
         # Filter outliers
+        print "Filter outliers"
         offset = int(self.outliers * mc_data.shape[0])
-        lower = mc_data[int(0.015 * self.iterations)]
-        upper = mc_data[int(0.985 * self.iterations)]
+        lower = mc_data[offset]
+        upper = mc_data[-offset]
         mc_data = mc_data[offset:-offset]
         num_bins = max(
             100,
             min(20, int(np.sqrt(self.iterations)))
             )
         # Gaussian KDE to smooth fit
+        print "KDE smoothing"
         kde = gaussian_kde(mc_data)
         kde_xs = np.linspace(mc_data.min(), mc_data.max(), 500)
         kde_ys = kde.evaluate(kde_xs)
         # Histogram
+        print "Histogram"
         hist_ys, hist_xs = np.histogram(mc_data, bins=num_bins, density=True)
         hist_xs = np.repeat(hist_xs, 2)
         hist_ys = np.hstack((
@@ -106,6 +111,7 @@ class SerializedLCAReport(object):
             np.repeat(hist_ys, 2),
             np.array(0),
             ))
+        print "Finished .get_monte_carlo"
         return {
             "smoothed": zip(kde_xs.tolist(), kde_ys.tolist()),
             "histogram": zip(hist_xs.tolist(), hist_ys.tolist()),

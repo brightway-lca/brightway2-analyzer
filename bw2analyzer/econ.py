@@ -6,7 +6,7 @@ def gini_coefficient(x):
     """
     Return computed Gini coefficient.
 
-    See http://en.wikipedia.org/wiki/Gini_coefficient
+    See https://en.wikipedia.org/wiki/Gini_coefficient
 
     Adapted from econpy library.
     copyright: 2005-2009 Alan G. Isaac
@@ -32,7 +32,7 @@ def herfindahl_index(x, normalize=True):
     """
     Return computed Herfindahl index.
 
-    See http://en.wikipedia.org/wiki/Herfindahl_index
+    See https://en.wikipedia.org/wiki/Herfindahl_index
 
     Normalized scores are bounded [0, 1]; non-normalized scores are [1/len(x), 1]. Normalization only counts non-zero values.
 
@@ -57,7 +57,7 @@ def concentration_ratio(x, number=4):
     """
     Return computed concentration ratio.
 
-    See http://en.wikipedia.org/wiki/Concentration_ratio
+    See https://en.wikipedia.org/wiki/Concentration_ratio
 
     The concentration ratio measures the share of the market controlled by the top *number* firms. Returned ratio values vary from 0 to 1.
 
@@ -79,7 +79,7 @@ def theil_index(x):
     """
     Return Theil entropy index.
 
-    See http://en.wikipedia.org/wiki/Theil_Index
+    See https://en.wikipedia.org/wiki/Theil_Index
 
     The Theil index is a measure of economic inequality based on information theory. It is the difference between a dataset's maximum possible entropy and observed entropy.
 

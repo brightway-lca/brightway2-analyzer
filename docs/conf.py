@@ -12,16 +12,16 @@
 # The short X.Y version.
 version = '0.5'
 # The full version, including alpha/beta/rc tags.
-release = '0.5.1'
+release = '0.5'
 
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
-from os.path import abspath, dirname
+# import sys
+# from os.path import abspath, dirname
 
 # Make sure we use this copy of Brightway2
-sys.path.insert(1, abspath(dirname(dirname(__file__))))
+# sys.path.insert(1, abspath(dirname(dirname(__file__))))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

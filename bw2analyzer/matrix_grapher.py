@@ -11,7 +11,7 @@ class SparseMatrixGrapher(object):
     def __init__(self, matrix):
         self.matrix = matrix
 
-    def graph(self, filename, marker_string='c.', mew=0, ms=1, alpha=0.8):
+    def graph(self, filename=None, marker_string='c.', mew=0, ms=1, alpha=0.8):
         tm = self.matrix.tocoo()
         y, x = self.matrix.shape
         plt.figure(figsize=(x / 1000, y / 1000))
@@ -25,4 +25,5 @@ class SparseMatrixGrapher(object):
         ax.set_ylim((0, tm.shape[0]))
         ax.set_xlim((0, tm.shape[1]))
         plt.box(False)
-        plt.savefig(filename, dpi=300)
+        if filename:
+            plt.savefig(filename, dpi=300)

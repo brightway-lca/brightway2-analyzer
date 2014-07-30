@@ -5,4 +5,4 @@ from .explorer import DatabaseExplorer
 from .sc_graph import GTManipulator
 from .report import SerializedLCAReport
 
-__version__ = (0, 5, 1)
+__version__ = (0, 5, 2)

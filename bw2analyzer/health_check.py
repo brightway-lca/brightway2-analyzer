@@ -50,21 +50,17 @@ class DatabaseHealthCheck(object):
         for ds in data.values():
             for exc in ds.get(u'exchanges', []):
                 ut = exc.get(u'uncertainty type')
+                results[ut]['total'] += 1
                 if ut == LognormalUncertainty.id:
-                    results[ut]['total'] += 1
-                    right_amount = np.allclose(np.log(np.abs(exc[u'amount'])), exc[u'loc'])
+                    right_amount = np.allclose(np.log(np.abs(exc[u'amount'])), exc[u'loc'], rtol=1e-3)
                     if not exc.get("scale") or not right_amount:
                         results[ut]['bad'] += 1
                 elif ut == NormalUncertainty.id:
-                    results[ut]['total'] += 1
                     if not exc.get(u"scale") or abs(exc[u'amount']) != exc[u'loc']:
                         results[ut]['bad'] += 1
-                        print exc
                 elif ut in {TriangularUncertainty.id, UniformUncertainty.id}:
-                    results[ut]['total'] += 1
                     if exc['minimum'] == exc['maximum']:
                         results[ut]['bad'] += 1
-                        print exc
         return results
 
 

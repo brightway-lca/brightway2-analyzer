@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 from brightway2 import Database
 from bw2calc import LCA
 from numpy import array, ones, absolute, dot, where
@@ -10,15 +11,17 @@ class ConvergenceError(StandardError):
 class PageRank(object):
     def __init__(self, database):
         self.database = database
-        self.process = Database(database).load().keys()[0]
 
     def calculate(self):
-        self.lca = LCA({self.process: 1})
+        self.lca = LCA({self.database.random(): 1})
         self.lca.lci()
-        self.rev_dict, dummy = self.lca.reverse_dict()
+        self.lca.fix_dictionaries()
+        self.rt, _ = self.lca.reverse_dict()
         self.matrix = self.lca.technosphere_matrix.transpose()
-        self.pr = [(x[0], self.rev_dict[x[1]]) for x in self.page_rank(
-            self.matrix)]
+        self.pr = [
+            (x[0], self.rt[x[1]])
+            for x in self.page_rank(self.matrix)
+        ]
         return self.pr
 
     def page_rank(self, technosphere, alpha=0.85, max_iter=100, tol=1e-6):

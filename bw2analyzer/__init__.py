@@ -1,8 +1,9 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*
 from .contribution import ContributionAnalysis
-from .page_rank import PageRank
 from .explorer import DatabaseExplorer
-from .sc_graph import GTManipulator
+from .health_check import DatabaseHealthCheck
+from .page_rank import PageRank
 from .report import SerializedLCAReport
+from .sc_graph import GTManipulator
 
 __version__ = (0, 5, 1)

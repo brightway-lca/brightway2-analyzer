@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*
 from brightway2 import Database, databases
 
 

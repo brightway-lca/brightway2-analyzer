@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
-from . import ContributionAnalysis, GTManipulator
+from .contribution import ContributionAnalysis
 from .econ import herfindahl_index, concentration_ratio
+from .sc_graph import GTManipulator
 from brightway2 import JsonWrapper, methods, config
 from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
 from scipy.stats import gaussian_kde
@@ -33,13 +34,20 @@ class SerializedLCAReport(object):
         rt, rb = lca.reverse_dict()
 
         gt = GraphTraversal().calculate(self.activity, method=self.method)
+        print "FD"
         force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
+        print "CA"
         ca = ContributionAnalysis()
+        print "hinton"
         hinton = ca.hinton_matrix(lca)
+        print "treemap"
         treemap = self.get_treemap(gt['nodes'], gt['edges'], lca)
+        print "herfindahl"
         herfindahl = herfindahl_index(lca.characterized_inventory.data)
+        print "concentration"
         concentration = concentration_ratio(lca.characterized_inventory.data)
-        # monte_carlo = self.get_monte_carlo()
+        print "MC:"
+        monte_carlo = self.get_monte_carlo()
 
         self.report = {
             "activity": [(ca.get_name(k), "%.2g" % v, ca.db_names[k[0]][k][

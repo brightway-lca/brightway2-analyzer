@@ -11,10 +11,11 @@ class SparseMatrixGrapher(object):
     def __init__(self, matrix):
         self.matrix = matrix
 
-    def graph(self, filename=None, marker_string='c.', mew=0, ms=1, alpha=0.8):
+    def graph(self, filename=None, marker_string='c.', mew=0, ms=1, alpha=0.8,
+              width=None, height=None, dpi=300):
         tm = self.matrix.tocoo()
         y, x = self.matrix.shape
-        plt.figure(figsize=(x / 1000, y / 1000))
+        plt.figure(figsize=(width or x / 1000, height or y / 1000))
         ax = plt.axes([0, 0, 1, 1])
         # Start from top left corner, not bottom left corner
         ax.plot(tm.shape[1] - tm.col, tm.row, marker_string, mew=mew, ms=ms, alpha=alpha)

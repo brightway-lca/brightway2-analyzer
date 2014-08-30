@@ -28,6 +28,7 @@ class DatabaseHealthCheck(object):
             'me': aggregated['many_exchanges'],
             'nsp': self.no_self_production(),
             'mo': self.multioutput_processes(),
+            'ob': self.ouroboros(),
         }
 
     def make_graphs(self, graphs_dir=None):
@@ -116,11 +117,26 @@ class DatabaseHealthCheck(object):
     def no_self_production(self):
         self_production = lambda a, b: not a or b in a
         return {
-            key
-            for key, value in self.db.load().items()
+            key for key, value in self.db.load().items()
             if value.get(u"type", u"process") == u"process"
             and not self_production({
                 exc[u"input"] for exc in value.get(u"exchanges", [])
                 if exc[u"type"] == u"production"
             }, key)
+        }
+
+    def ouroboros(self):
+        """Find processes that consume their own reference products as inputs. Not necessarily an error, but should be examined carefully (see `Two potential points of confusion in LCA math <http://chris.mutel.org/too-confusing.html>`__).
+
+        Returns:
+            A set of database keys.
+
+        """
+        return {
+            key for key, value in self.db.load().items()
+            if any(
+                exc for exc in value.get(u"exchanges", [])
+                if exc[u"input"] == key
+                and exc[u"type"] == u"technosphere"
+            )
         }

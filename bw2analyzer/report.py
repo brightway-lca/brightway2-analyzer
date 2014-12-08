@@ -64,7 +64,7 @@ class SerializedLCAReport(object):
                 "concentration": concentration
                 },
             "force_directed": force_directed,
-            "monte carlo": None,
+            "monte carlo": monte_carlo,
             "metadata": {
                 "type": "Brightway2 serialized LCA report",
                 "version": self.version,
@@ -84,17 +84,20 @@ class SerializedLCAReport(object):
         if not self.iterations:
             # No Monte Carlo desired
             return None
-        mc_data = np.array(ParallelMonteCarlo(
+        mc_data = ParallelMonteCarlo(
             self.activity,
             self.method,
             iterations=self.iterations,
             cpus=self.cpus
-            ).calculate())
-        print "Finished MC .calculate(); Sorting"
-        mc_data.sort()
+        ).calculate()
+        print "Converting to array"
+        mc_data = np.array(mc_data)
+        print "Checking shape"
         if np.unique(mc_data).shape[0] == 1:
             # No uncertainty in database
             return None
+        print "Finished MC .calculate(); Sorting"
+        mc_data.sort()
         # Filter outliers
         print "Filter outliers"
         offset = int(self.outliers * mc_data.shape[0])

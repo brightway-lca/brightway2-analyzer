@@ -49,7 +49,7 @@ Returns:
             limit = (data >= (total * limit)).sum()
 
         results = np.hstack((data.reshape((-1, 1)),
-            np.arange(data.shape[0]).reshape((-1, 1))))
+                             np.arange(data.shape[0]).reshape((-1, 1))))
         return results[np.argsort(np.abs(data))[::-1]][:limit, :]
 
     def top_matrix(self, matrix, rows=5, cols=5):
@@ -93,9 +93,9 @@ Returns:
 
 """
         top_rows = np.argsort(np.abs(np.array(matrix.sum(axis=1)).ravel())
-            )[:-rows - 1:-1]
+                              )[:-rows - 1:-1]
         top_cols = np.argsort(np.abs(np.array(matrix.sum(axis=0)).ravel())
-            )[:-cols - 1:-1]
+                              )[:-cols - 1:-1]
         elements = []
         for row, x in enumerate(top_rows):
             for col, y in enumerate(top_cols):
@@ -105,13 +105,13 @@ Returns:
 
     def hinton_matrix(self, lca, rows=5, cols=5):
         coo, b, t = self.top_matrix(lca.characterized_inventory,
-            rows=rows, cols=cols)
+                                    rows=rows, cols=cols)
         coo = [row[2:] for row in coo]  # Don't need matrix indices
         rt, rb = lca.reverse_dict()
         flows = [self.get_name(rb[x]) for x in b]
         activities = [self.get_name(rt[x]) for x in t]
         return {"results": coo, "total": lca.score, "xlabels": activities,
-            "ylabels": flows}
+                "ylabels": flows}
 
     def annotate(self, sorted_data, rev_mapping):
         """Reverse the mapping from database ids to array indices"""
@@ -125,19 +125,39 @@ Returns:
         """Return an array of [value, index] biosphere emissions."""
         return self.sort_array(np.array(matrix.sum(axis=1)).ravel(), **kwargs)
 
-    def annotated_top_processes(self, lca, **kwargs):
-        if lca._mapped_dict:
-            lca.fix_dictionaries()
-        rt, rb = lca.reverse_dict()
-        return [(score, self.get_name(rt[index])) for score, index in \
-            self.top_processes(lca.characterized_inventory)]
+    def annotated_top_processes(self, lca, names=True, **kwargs):
+        """Get list of most damaging processes in an LCA, sorted by ``abs(direct impact)``.
 
-    def annotated_top_emissions(self, lca, **kwargs):
+        Returns a list of tuples: ``(lca score, supply, name)``. If ``names`` is False, they returns the process key as the last element.
+
+        """
         if lca._mapped_dict:
             lca.fix_dictionaries()
         rt, rb = lca.reverse_dict()
-        return [(score, self.get_name(rb[index])) for score, index in \
-            self.top_emissions(lca.characterized_inventory)]
+        results = [(score, lca.supply_array[index], rt[index])
+                   for score, index in self.top_processes(
+                   lca.characterized_inventory, **kwargs)]
+        if names:
+            results = [(x[0], x[1], self.get_name(x[2])) for x in results]
+        return results
+
+
+    def annotated_top_emissions(self, lca, names=True, **kwargs):
+        """Get list of most damaging biosphere flows in an LCA, sorted by ``abs(direct impact)``.
+
+        Returns a list of tuples: ``(lca score, inventory amount, name)``. If ``names`` is False, they returns the process key as the last element.
+
+        """
+        if lca._mapped_dict:
+            lca.fix_dictionaries()
+        rt, rb = lca.reverse_dict()
+        results = [(score, lca.inventory[index, :].sum(), rb[index])
+                   for score, index in self.top_emissions(
+                   lca.characterized_inventory, **kwargs)
+        ]
+        if names:
+            results = [(x[0], x[1], self.get_name(x[2])) for x in results]
+        return results
 
     def get_name(self, key):
         if key[0] not in self.db_names:
@@ -145,7 +165,7 @@ Returns:
         return self.db_names[key[0]][key].get("name", "Unknown")
 
     def d3_treemap(self, matrix, rev_bio, rev_techno, limit=0.025,
-            limit_type="percent"):
+                   limit_type="percent"):
         """
 Construct treemap input data structure for LCA result. Output like:
 
@@ -165,26 +185,26 @@ Construct treemap input data structure for LCA result. Output like:
         """
         total = np.abs(matrix).sum()
         processes = self.top_processes(matrix, limit=limit,
-            limit_type=limit_type)
+                                       limit_type=limit_type)
         data = {"name": "LCA result", "children": [], "size": total}
         for dummy, tech_index in processes:
             name = self.get_name(rev_techno[tech_index])
             this_score = np.abs(matrix[:, tech_index].toarray().ravel()).sum()
             children = []
             for score, bio_index in self.sort_array(matrix[:, tech_index
-                    ].toarray().ravel(), limit=limit, limit_type=limit_type,
-                    total=total):
+                                                           ].toarray().ravel(), limit=limit, limit_type=limit_type,
+                                                    total=total):
                 children.append({"name": self.get_name(rev_bio[bio_index]),
-                    "size": float(abs(matrix[bio_index, tech_index]))})
+                                 "size": float(abs(matrix[bio_index, tech_index]))})
             children_score = sum([x["size"] for x in children])
             if children_score < (0.95 * this_score):
                 children.append({"name": "Others", "size":
-                    this_score - children_score})
+                                 this_score - children_score})
             data["children"].append({
                 "name": name,
                 "size": this_score,
                 # "children": children
-                })
+            })
         return data
 
     # def top_emissions_for_process(self, process, **kwargs):

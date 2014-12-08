@@ -6,4 +6,4 @@ from .page_rank import PageRank
 from .report import SerializedLCAReport
 from .sc_graph import GTManipulator
 
-__version__ = (0, 6, 1)
+__version__ = (0, 7)

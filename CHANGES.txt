@@ -1,6 +1,24 @@
 Changelog
 *********
 
+0.7 (2014-12-09)
+================
+
+Thanks Bernhard Steubing for good ideas and bugfixes.
+
+* ENHANCEMENT: Add amount to annotated top processes and emissions.
+* BUGFIX: Propagate **kwargs** in contribution analysis. 
+
+0.6.1 (2014-08-30)
+==================
+
+* ENHANCMENT: Add ouroboros health check (processes which consume their own outcome)
+
+0.6 (2014-08-29)
+================
+
+* FEATURE: Database health check! Does a number of tests on a Database to see if potential problems can be identified.
+
 0.5.2 (2014-07-30)
 ==================
 

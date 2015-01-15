@@ -11,7 +11,7 @@ class SparseMatrixGrapher(object):
     def __init__(self, matrix):
         self.matrix = matrix
 
-    def graph(self, filename=None, marker_string='c.', mew=0, ms=1, alpha=0.8,
+    def graph(self, filename=None, marker_string='c.', mew=0.5, ms=1, alpha=0.8,
               width=None, height=None, dpi=300):
         tm = self.matrix.tocoo()
         y, x = self.matrix.shape

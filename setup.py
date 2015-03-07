@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='bw2analyzer',
-    version="0.7",
+    version="0.8",
     packages=["bw2analyzer", "bw2analyzer.tests"],
     author="Chris Mutel",
     author_email="cmutel@gmail.com",

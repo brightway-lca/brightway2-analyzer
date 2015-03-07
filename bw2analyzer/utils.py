@@ -77,7 +77,7 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         if lca.score == 0.:
             continue
 
-        col = lca.technosphere_dict[mapping[key]]
+        col = lca.activity_dict[mapping[key]]
         results['activities'][:, col] = get_normalized_scores(lca, 'activities')
         results['flows'][:, col] = get_normalized_scores(lca, 'flows')
         results_all = get_normalized_scores(lca, 'all')
@@ -94,7 +94,7 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         pbar.finish()
 
     lca.fix_dictionaries()
-    return results, lca.technosphere_dict, time() - start
+    return results, lca.activity_dict, time() - start
 
 
 def group_by_emissions(method):

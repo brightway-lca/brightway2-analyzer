@@ -74,7 +74,7 @@ class GTManipulator(object):
     @staticmethod
     def add_metadata(nodes, lca):
         """Add metadata to nodes, like name, unit, and category."""
-        rt, rb = lca.reverse_dict()
+        ra, rp, rb = lca.reverse_dict()
         new_nodes = {}
         for key, value in nodes.iteritems():
             new_value = copy.deepcopy(value)
@@ -89,7 +89,7 @@ class GTManipulator(object):
                     index = value['row']
                 else:
                     index = key
-                code = rt[index]
+                code = ra[index]
                 ds = Database(code[0]).load()[code]
                 new_value.update({
                     'name': ds.get('name', "Unknown"),
@@ -185,7 +185,7 @@ class GTManipulator(object):
     @staticmethod
     def d3_treemap(nodes, edges, lca, add_biosphere=False):
         """Add node data by traversing the graph; assign different metadata to leaf nodes."""
-        rt, rb = lca.reverse_dict()
+        ra, rp, rb = lca.reverse_dict()
 
         child_nodes = lambda node, edges: [e['from'] for e in edges if e['to'] == node]
 
@@ -204,7 +204,7 @@ class GTManipulator(object):
 
             if 'row' in node_data:
                 node_key = node_data['row']
-            key = rt[node_key]
+            key = ra[node_key]
             ds = Database(key[0]).load()[key]
             return {
                 'name': ds.get('name', "Unknown"),

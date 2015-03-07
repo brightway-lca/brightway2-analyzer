@@ -9,12 +9,12 @@ class ParameterFinder(object):
         assert isinstance(lca, LCA), "Must provide ``LCA`` object as input"
         self.lca = lca
         self.lca.fix_dictionaries()
-        self.rt, self.rb = self.lca.reverse_dict()
+        self.ra, self.rp, self.rb = self.lca.reverse_dict()
 
     def find_technosphere(self, row, col):
-        inp = self.rt[row]
+        inp = self.rp[row]
         inp_data = Database(inp[0]).load()[inp]
-        outp = self.rt[col]
+        outp = self.ra[col]
         outp_data = Database(outp[0]).load()[outp]
         try:
             exc = [x for x in outp_data.get("exchanges", []) if x['input'] == inp][0]
@@ -35,7 +35,7 @@ class ParameterFinder(object):
     def find_biosphere(self, row, col):
         inp = self.rb[row]
         inp_data = Database(inp[0]).load()[inp]
-        outp = self.rt[col]
+        outp = self.ra[col]
         outp_data = Database(outp[0]).load()[outp]
         try:
             exc = [x for x in outp_data.get("exchanges", []) if x['input'] == inp][0]

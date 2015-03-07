@@ -176,7 +176,11 @@ class UnrollGraphTestCase(unittest.TestCase):
 class MetadataTestCase(BW2DataTest):
     class LCAMock(object):
         def reverse_dict(self):
-            return {1: ("A", "a"), 2: ("A", "b"), 3: ("A", "c")}, {}
+            return (
+                {1: ("A", "a"), 2: ("A", "b"), 3: ("A", "c")},
+                {1: ("A", "a"), 2: ("A", "b"), 3: ("A", "c")},
+                {}
+            )
 
     def extra_setup(self):
         data = {

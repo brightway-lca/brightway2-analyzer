@@ -107,9 +107,9 @@ Returns:
         coo, b, t = self.top_matrix(lca.characterized_inventory,
                                     rows=rows, cols=cols)
         coo = [row[2:] for row in coo]  # Don't need matrix indices
-        rt, rb = lca.reverse_dict()
+        ra, rp, rb = lca.reverse_dict()
         flows = [self.get_name(rb[x]) for x in b]
-        activities = [self.get_name(rt[x]) for x in t]
+        activities = [self.get_name(ra[x]) for x in t]
         return {"results": coo, "total": lca.score, "xlabels": activities,
                 "ylabels": flows}
 
@@ -133,8 +133,8 @@ Returns:
         """
         if lca._mapped_dict:
             lca.fix_dictionaries()
-        rt, rb = lca.reverse_dict()
-        results = [(score, lca.supply_array[index], rt[index])
+        ra, rp, rb = lca.reverse_dict()
+        results = [(score, lca.supply_array[index], ra[index])
                    for score, index in self.top_processes(
                    lca.characterized_inventory, **kwargs)]
         if names:
@@ -150,7 +150,7 @@ Returns:
         """
         if lca._mapped_dict:
             lca.fix_dictionaries()
-        rt, rb = lca.reverse_dict()
+        ra, rp, rb = lca.reverse_dict()
         results = [(score, lca.inventory[index, :].sum(), rb[index])
                    for score, index in self.top_emissions(
                    lca.characterized_inventory, **kwargs)

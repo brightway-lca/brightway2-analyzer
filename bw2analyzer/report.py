@@ -31,7 +31,6 @@ class SerializedLCAReport(object):
         lca.lci()
         lca.lcia()
         lca.fix_dictionaries()
-        rt, rb = lca.reverse_dict()
 
         gt = GraphTraversal().calculate(self.activity, method=self.method)
         print "FD"

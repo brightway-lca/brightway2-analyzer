@@ -4,7 +4,8 @@ Changelog
 0.8 (2015-03-07)
 ================
 
-Compatibility with bw2calc 1.0
+* Compatibility with bw2calc 1.0 (split products and activities)
+* Add ordered matrix graph
 
 0.7 (2014-12-09)
 ================

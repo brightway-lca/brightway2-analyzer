@@ -1,6 +1,6 @@
 brightway2
-bw2calc>=0.15.1
-bw2data>=1.0
+bw2calc>=1.0
+bw2data>=1.5
 bw2ui>=0.15
 colorama
 docopt

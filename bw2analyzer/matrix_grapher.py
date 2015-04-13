@@ -64,8 +64,8 @@ class SparseMatrixGrapher(object):
         ax.yaxis.set_ticks_position('none')
         ax.xaxis.set_ticklabels([])
         ax.yaxis.set_ticklabels([])
-        ax.set_ylim((0, tm.shape[0]))
-        ax.set_xlim((0, tm.shape[1]))
+        ax.set_ylim((0, self.matrix.shape[0]))
+        ax.set_xlim((0, self.matrix.shape[1]))
         plt.box(False)
         if filename:
             plt.savefig(filename, dpi=dpi)

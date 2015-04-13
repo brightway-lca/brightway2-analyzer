@@ -2,7 +2,7 @@
 import copy
 import itertools
 from heapq import heappush, heappop
-from bw2data import Database, config
+from bw2data import Database, config, get_activity
 
 
 def tupify(o):
@@ -90,7 +90,7 @@ class GTManipulator(object):
                 else:
                     index = key
                 code = ra[index]
-                ds = Database(code[0]).load()[code]
+                ds = get_activity(code)
                 new_value.update({
                     'name': ds.get('name', "Unknown"),
                     'categories': ds.get('categories', []),
@@ -205,7 +205,7 @@ class GTManipulator(object):
             if 'row' in node_data:
                 node_key = node_data['row']
             key = ra[node_key]
-            ds = Database(key[0]).load()[key]
+            ds = get_activity(key)
             return {
                 'name': ds.get('name', "Unknown"),
                 'unit': ds.get('unit', "Unknown"),

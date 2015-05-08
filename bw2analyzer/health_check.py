@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*
 from .page_rank import PageRank
 from bw2calc import LCA
-from bw2data import Database, config
+from bw2data import Database, projects
 from bw2data.utils import safe_filename
 from stats_arrays import *
 import numpy as np
@@ -42,10 +42,10 @@ class DatabaseHealthCheck(object):
         lca = LCA({self.db.random(): 1})
         lca.lci()
         tech_filename = safe_filename(self.db.name) + u".technosphere.png"
-        tech_filepath = os.path.join(graphs_dir or config.request_dir("export"), tech_filename)
+        tech_filepath = os.path.join(graphs_dir or projects.request_directory("export"), tech_filename)
         SparseMatrixGrapher(lca.technosphere_matrix).graph(tech_filepath, dpi=600)
         bio_filename = safe_filename(self.db.name) + u".biosphere.png"
-        bio_filepath = os.path.join(graphs_dir or config.request_dir("export"), bio_filename)
+        bio_filepath = os.path.join(graphs_dir or projects.request_directory("export"), bio_filename)
         SparseMatrixGrapher(lca.biosphere_matrix).graph(bio_filepath, dpi=600)
         return tech_filepath, tech_filename, bio_filepath, bio_filename
 

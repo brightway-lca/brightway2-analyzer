@@ -1,4 +1,7 @@
-from __future__ import division
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals, division
+from eight import *
+
 from ..sc_graph import GTManipulator
 from bw2data import databases, Database
 from bw2data.tests import BW2DataTest
@@ -280,10 +283,10 @@ class SimplifyTestCase(unittest.TestCase):
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 2, 0.1)
         self.assertEqual(
             new_nodes,
-            {key: value for key, value in nodes.iteritems() if key in (1, 3)}
+            {key: value for key, value in nodes.items() if key in (1, 3)}
         )
         self.assertEqual(
-            new_edges,
+            list(new_edges),
             [{'to': 1, 'from': 3, 'amount': 3, 'exc_amount': 4, 'impact': 5}]
         )
 
@@ -309,14 +312,14 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 4, 'amount': 2, 'exc_amount': 2, 'impact': 3},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 9, 0.1)
-        expected_nodes = {key: value for key, value in nodes.iteritems()
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
             {'to': 2, 'from': 4, 'amount': 1.6, 'exc_amount': 0.4, 'impact': 2},
             {'to': 1, 'from': 4, 'amount': 0.4, 'exc_amount': 0.4, 'impact': 1},
         ]
-        self.assertEqual(expected_edges, new_edges)
+        self.assertEqual(expected_edges, list(new_edges))
 
     def test_no_self_edge(self):
         """Test that collapsed edges from a -> a are deleted."""
@@ -332,14 +335,14 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 4, 'amount': 2, 'exc_amount': 2, 'impact': 3},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 9, 0.1)
-        expected_nodes = {key: value for key, value in nodes.iteritems()
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
             {'to': 2, 'from': 4, 'amount': 1.6, 'exc_amount': 0.4, 'impact': 2},
             {'to': 1, 'from': 4, 'amount': 0.4, 'exc_amount': 0.4, 'impact': 1},
         ]
-        self.assertEqual(expected_edges, new_edges)
+        self.assertEqual(expected_edges, list(new_edges))
 
     def test_diamond(self):
         """Test supply chain graph like this:
@@ -364,13 +367,13 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 4, 'amount': 3, 'exc_amount': 1, 'impact': 3},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 5, 0.1)
-        expected_nodes = {key: value for key, value in nodes.iteritems()
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 4)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
             {'to': 1, 'from': 4, 'amount': 5, 'exc_amount': 2, 'impact': 5}
         ]
-        self.assertEqual(expected_edges, new_edges)
+        self.assertEqual(expected_edges, list(new_edges))
 
     def test_x(self):
         """Test supply chain graph like this:
@@ -395,7 +398,7 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 5, 'amount': 12, 'exc_amount': 4, 'impact': 24},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 53, 0.01)
-        expected_nodes = {key: value for key, value in nodes.iteritems()
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4, 5)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
@@ -404,5 +407,8 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 2, 'from': 5, 'amount': 8, 'exc_amount': 8, 'impact': 16},
             {'to': 2, 'from': 4, 'amount': 6, 'exc_amount': 6, 'impact': 18},
         ]
-        self.assertEqual(expected_edges, new_edges)
+        self.assertEqual(
+            sorted(expected_edges, key=lambda x: (x['to'], x['from'])),
+            sorted(new_edges, key=lambda x: (x['to'], x['from']))
+        )
 

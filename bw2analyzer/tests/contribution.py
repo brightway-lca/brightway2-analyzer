@@ -1,7 +1,11 @@
-import unittest
-import numpy as np
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 from ..contribution import ContributionAnalysis as CA
 from scipy import sparse
+import numpy as np
+import unittest
 
 class ContributionTestCase(unittest.TestCase):
     def test_sort_array_number(self):

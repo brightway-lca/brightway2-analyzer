@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 from brightway2 import Database
 from bw2calc import LCA
 from numpy import array, ones, absolute, dot, where
 
 
-class ConvergenceError(StandardError):
+class ConvergenceError(Exception):
     pass
 
 
@@ -61,7 +64,7 @@ References
 
         # Drop diagonals, and only indicate adjacency
         mat.data[:] = 1
-        for x in xrange(n):
+        for x in range(n):
             mat[x, x] = 0
 
         column_sum = array(mat.sum(axis=1)).flatten()

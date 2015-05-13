@@ -1,5 +1,7 @@
-# -*- coding: utf-8 -*
-from __future__ import division
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals, division
+from eight import *
+
 import numpy as np
 try:
     import matplotlib.pyplot as plt

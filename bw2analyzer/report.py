@@ -5,7 +5,7 @@ from eight import *
 from .contribution import ContributionAnalysis
 from .econ import herfindahl_index, concentration_ratio
 from .sc_graph import GTManipulator
-from brightway2 import JsonWrapper, methods, config
+from brightway2 import JsonWrapper, methods, config, projects
 from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
 from scipy.stats import gaussian_kde
 import numpy as np
@@ -146,7 +146,7 @@ class SerializedLCAReport(object):
 
     def write(self):
         """Write report data to file"""
-        dirpath = config.request_dir("reports")
+        dirpath = projects.request_directory("reports")
         filepath = os.path.join(dirpath, "report.%s.json" % self.uuid)
         JsonWrapper.dump(self.report, filepath)
 

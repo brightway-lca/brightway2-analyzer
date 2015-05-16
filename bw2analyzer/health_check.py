@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 from .page_rank import PageRank
 from bw2calc import LCA
 from bw2data import Database, projects

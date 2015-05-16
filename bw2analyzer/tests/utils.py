@@ -1,6 +1,10 @@
-from bw2data.tests import BW2DataTest
-from bw2data import Database, Method
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 from ..utils import group_by_emissions
+from bw2data import Database, Method
+from bw2data.tests import BW2DataTest
 
 
 class GroupingTestCase(BW2DataTest):

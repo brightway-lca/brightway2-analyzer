@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 from brightway2 import Database
 from bw2calc import LCA
 from numpy import array, ones, absolute, dot, where
 
 
-class ConvergenceError(StandardError):
+class ConvergenceError(Exception):
     pass
 
 

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
+from __future__ import print_function, unicode_literals, division
+from eight import *
+
 from .contribution import ContributionAnalysis
 from .econ import herfindahl_index, concentration_ratio
 from .sc_graph import GTManipulator
@@ -33,19 +35,19 @@ class SerializedLCAReport(object):
         lca.fix_dictionaries()
 
         gt = GraphTraversal().calculate(self.activity, method=self.method)
-        print "FD"
+        print("FD")
         force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
-        print "CA"
+        print("CA")
         ca = ContributionAnalysis()
-        print "hinton"
+        print("hinton")
         hinton = ca.hinton_matrix(lca)
-        print "treemap"
+        print("treemap")
         treemap = self.get_treemap(gt['nodes'], gt['edges'], lca)
-        print "herfindahl"
+        print("herfindahl")
         herfindahl = herfindahl_index(lca.characterized_inventory.data)
-        print "concentration"
+        print("concentration")
         concentration = concentration_ratio(lca.characterized_inventory.data)
-        print "MC:"
+        print("MC:")
         monte_carlo = self.get_monte_carlo()
 
         self.report = {
@@ -79,7 +81,7 @@ class SerializedLCAReport(object):
 
     def get_monte_carlo(self):
         """Get Monte Carlo results"""
-        print "Entered get_monte_carlo"
+        print("Entered get_monte_carlo")
         if not self.iterations:
             # No Monte Carlo desired
             return None
@@ -89,16 +91,16 @@ class SerializedLCAReport(object):
             iterations=self.iterations,
             cpus=self.cpus
         ).calculate()
-        print "Converting to array"
+        print("Converting to array")
         mc_data = np.array(mc_data)
-        print "Checking shape"
+        print("Checking shape")
         if np.unique(mc_data).shape[0] == 1:
             # No uncertainty in database
             return None
-        print "Finished MC .calculate(); Sorting"
+        print("Finished MC .calculate(); Sorting")
         mc_data.sort()
         # Filter outliers
-        print "Filter outliers"
+        print("Filter outliers")
         offset = int(self.outliers * mc_data.shape[0])
         lower = mc_data[offset]
         upper = mc_data[-offset]
@@ -108,12 +110,12 @@ class SerializedLCAReport(object):
             min(20, int(np.sqrt(self.iterations)))
             )
         # Gaussian KDE to smooth fit
-        print "KDE smoothing"
+        print("KDE smoothing")
         kde = gaussian_kde(mc_data)
         kde_xs = np.linspace(mc_data.min(), mc_data.max(), 500)
         kde_ys = kde.evaluate(kde_xs)
         # Histogram
-        print "Histogram"
+        print("Histogram")
         hist_ys, hist_xs = np.histogram(mc_data, bins=num_bins, density=True)
         hist_xs = np.repeat(hist_xs, 2)
         hist_ys = np.hstack((
@@ -121,7 +123,7 @@ class SerializedLCAReport(object):
             np.repeat(hist_ys, 2),
             np.array(0),
             ))
-        print "Finished .get_monte_carlo"
+        print("Finished .get_monte_carlo")
         return {
             "smoothed": zip(kde_xs.tolist(), kde_ys.tolist()),
             "histogram": zip(hist_xs.tolist(), hist_ys.tolist()),

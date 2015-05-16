@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 import unittest
 import numpy as np
 from ..contribution import ContributionAnalysis as CA

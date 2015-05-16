@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals
+from eight import *
+
 import copy
 import itertools
 from heapq import heappush, heappop

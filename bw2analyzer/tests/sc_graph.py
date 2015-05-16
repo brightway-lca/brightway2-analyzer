@@ -1,4 +1,7 @@
-from __future__ import division
+# -*- coding: utf-8 -*-
+from __future__ import print_function, unicode_literals, division
+from eight import *
+
 from ..sc_graph import GTManipulator
 from bw2data import databases, Database
 from bw2data.tests import BW2DataTest

@@ -64,7 +64,7 @@ References
 
         # Drop diagonals, and only indicate adjacency
         mat.data[:] = 1
-        for x in xrange(n):
+        for x in range(n):
             mat[x, x] = 0
 
         column_sum = array(mat.sum(axis=1)).flatten()

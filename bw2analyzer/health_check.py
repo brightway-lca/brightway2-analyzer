@@ -69,11 +69,14 @@ class DatabaseHealthCheck(object):
             len(bio_exchanges), len(set(bio_exchanges))
 
     def uncertainty_check(self):
+        # TODO: Also report no (None) uncertainty
         data = self.db.load()
         results = {obj.id: {'total': 0, 'bad': 0} for obj in uncertainty_choices}
         for ds in data.values():
             for exc in ds.get(u'exchanges', []):
                 ut = exc.get(u'uncertainty type')
+                if ut is None:
+                    continue
                 results[ut]['total'] += 1
                 if ut == LognormalUncertainty.id:
                     right_amount = np.allclose(np.log(np.abs(exc[u'amount'])), exc[u'loc'], rtol=1e-3)
@@ -83,7 +86,7 @@ class DatabaseHealthCheck(object):
                     if not exc.get(u"scale") or abs(exc[u'amount']) != exc[u'loc']:
                         results[ut]['bad'] += 1
                 elif ut in {TriangularUncertainty.id, UniformUncertainty.id}:
-                    if exc['minimum'] == exc['maximum']:
+                    if exc['minimum'] >= exc['maximum']:
                         results[ut]['bad'] += 1
         return results
 

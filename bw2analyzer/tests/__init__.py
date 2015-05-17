@@ -4,3 +4,4 @@ from .econ import EconometricsTestCase
 from .matrix_grapher import MatrixGrapherTestCase
 from .sc_graph import UnrollGraphTestCase, MetadataTestCase, SimplifyTestCase
 from .utils import GroupingTestCase
+from .health_check import HealthCheckTestCase

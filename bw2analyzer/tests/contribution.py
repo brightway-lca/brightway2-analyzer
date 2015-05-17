@@ -2,10 +2,15 @@
 from __future__ import print_function, unicode_literals
 from eight import *
 
-import unittest
-import numpy as np
 from ..contribution import ContributionAnalysis as CA
+from bw2calc import LCA
+from bw2data import Method, Database
+from bw2data.tests import BW2DataTest
 from scipy import sparse
+import numpy as np
+import unittest
+import warnings
+
 
 class ContributionTestCase(unittest.TestCase):
     def test_sort_array_number(self):
@@ -79,3 +84,82 @@ class ContributionTestCase(unittest.TestCase):
             [(3, 1, 0, 0, 7), (1, 2, 1, 1, 4)],
             elements
         )
+
+class Contribution2TestCase(BW2DataTest):
+    def test_hinton_matrix_no_error(self):
+        test_lci = {
+            ("a", "flow"): {
+                'name': 'flow',
+                'type': 'biosphere'
+            },
+            ("a", "1"): {
+                'name': 'process 1',
+                'exchanges': [{
+                    'input': ("a", "flow"),
+                    'type': 'biosphere',
+                    'amount': 2
+                }]
+            },
+            ("a", "2"): {
+                'name': 'process 2',
+                'exchanges': [{
+                    'input': ("a", "flow"),
+                    'type': 'biosphere',
+                    'amount': 1
+                }, {
+                    'input': ("a", "1"),
+                    'type': 'technosphere',
+                    'amount': 1
+                }]
+            }
+        }
+        db = Database("a")
+        db.write(test_lci)
+        method = Method(('method',))
+        method.register()
+        method.write([(("a", "flow"), 1)])
+        lca = LCA({("a", "2"): 1}, method.name)
+        lca.lci()
+        lca.lcia()
+        lca.fix_dictionaries()
+        CA().hinton_matrix(lca, 2, 2)
+
+    def test_d3_treemap_no_error(self):
+        warnings.simplefilter("error", DeprecationWarning)
+        test_lci = {
+            ("a", "flow"): {
+                'name': 'flow',
+                'type': 'biosphere'
+            },
+            ("a", "1"): {
+                'name': 'process 1',
+                'exchanges': [{
+                    'input': ("a", "flow"),
+                    'type': 'biosphere',
+                    'amount': 2
+                }]
+            },
+            ("a", "2"): {
+                'name': 'process 2',
+                'exchanges': [{
+                    'input': ("a", "flow"),
+                    'type': 'biosphere',
+                    'amount': 1
+                }, {
+                    'input': ("a", "1"),
+                    'type': 'technosphere',
+                    'amount': 1
+                }]
+            }
+        }
+        db = Database("a")
+        db.write(test_lci)
+        method = Method(('method',))
+        method.register()
+        method.write([(("a", "flow"), 1)])
+        lca = LCA({("a", "2"): 1}, method.name)
+        lca.lci()
+        lca.lcia()
+        lca.fix_dictionaries()
+        ra, rp, rb = lca.reverse_dict()
+        CA().d3_treemap(lca.characterized_inventory, rb, ra)

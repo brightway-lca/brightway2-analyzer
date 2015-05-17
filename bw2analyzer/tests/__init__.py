@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
+from .contribution import ContributionTestCase, Contribution2TestCase
 from .econ import EconometricsTestCase
-from .utils import GroupingTestCase
+from .matrix_grapher import MatrixGrapherTestCase
 from .sc_graph import UnrollGraphTestCase, MetadataTestCase, SimplifyTestCase
-from .contribution import ContributionTestCase
+from .utils import GroupingTestCase

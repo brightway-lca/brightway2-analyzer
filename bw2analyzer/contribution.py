@@ -2,14 +2,11 @@
 from __future__ import print_function, unicode_literals, division
 from eight import *
 
-from brightway2 import Database
+from bw2data import Database, get_activity
 import numpy as np
 
 
 class ContributionAnalysis(object):
-    def __init__(self):
-        self.db_names = {}
-
     def sort_array(self, data, limit=25, limit_type="number", total=None):
         """
 Common sorting function for all ``top`` methods. Sorts by highest value first.
@@ -162,9 +159,7 @@ Returns:
         return results
 
     def get_name(self, key):
-        if key[0] not in self.db_names:
-            self.db_names[key[0]] = Database(key[0]).load()
-        return self.db_names[key[0]][key].get("name", "Unknown")
+        return get_activity(key)['name']
 
     def d3_treemap(self, matrix, rev_bio, rev_techno, limit=0.025,
                    limit_type="percent"):
@@ -191,13 +186,13 @@ Construct treemap input data structure for LCA result. Output like:
         data = {"name": "LCA result", "children": [], "size": total}
         for dummy, tech_index in processes:
             name = self.get_name(rev_techno[tech_index])
-            this_score = np.abs(matrix[:, tech_index].toarray().ravel()).sum()
+            this_score = np.abs(matrix[:, int(tech_index)].toarray().ravel()).sum()
             children = []
-            for score, bio_index in self.sort_array(matrix[:, tech_index
+            for score, bio_index in self.sort_array(matrix[:, int(tech_index)
                                                            ].toarray().ravel(), limit=limit, limit_type=limit_type,
                                                     total=total):
                 children.append({"name": self.get_name(rev_bio[bio_index]),
-                                 "size": float(abs(matrix[bio_index, tech_index]))})
+                                 "size": float(abs(matrix[int(bio_index), int(tech_index)]))})
             children_score = sum([x["size"] for x in children])
             if children_score < (0.95 * this_score):
                 children.append({"name": "Others", "size":

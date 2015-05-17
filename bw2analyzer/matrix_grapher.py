@@ -24,18 +24,18 @@ class SparseMatrixGrapher(object):
         plt.figure(figsize=(width or x / 1000, height or y / 1000))
         ax = plt.axes([0, 0, 1, 1])
         # Start from top left corner, not bottom left corner
-        ax.plot(tm.shape[1] - tm.col, tm.row, marker_string, mew=mew, ms=ms, alpha=alpha)
         ax.xaxis.set_ticks_position('none')
         ax.yaxis.set_ticks_position('none')
         ax.xaxis.set_ticklabels([])
         ax.yaxis.set_ticklabels([])
+        ax.plot(tm.shape[1] - tm.col, tm.row, marker_string, mew=mew, ms=ms, alpha=alpha)
         ax.set_ylim((0, tm.shape[0]))
         ax.set_xlim((0, tm.shape[1]))
         plt.box(False)
         if filename:
             plt.savefig(filename, dpi=dpi)
 
-    def ordered_graph(self, filename=None, dpi=600):
+    def ordered_graph(self, filename=None, dpi=600, width=None, height=None):
         if not reverse_cuthill_mckee:
             raise ImportError(u"Install scipy version >= 0.15")
 
@@ -58,7 +58,7 @@ class SparseMatrixGrapher(object):
 
         colors = unroll(get_colors(get_distances(as_coo.col, as_coo.row)))
 
-        plt.figure(figsize=(x / 1000, y / 1000))
+        plt.figure(figsize=(width or x / 1000, height or y / 1000))
         ax = plt.axes([0,0,1,1])
         plt.scatter(list(as_coo.shape[1] - as_coo.col), list(as_coo.row),
                     s=10, c=colors, marker=".", edgecolors="None")

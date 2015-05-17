@@ -6,7 +6,7 @@ from time import time
 from bw2calc import LCA
 from bw2data import Database, methods, databases, mapping, Method, config
 import numpy as np
-import progressbar
+import pyprind
 
 
 def contribution_for_all_datasets_one_method(database, method, progress=True):
@@ -61,20 +61,10 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         'all': np.zeros((all_cutoff, cols), dtype=np.float32)
     }
 
-    if progress:
-        widgets = [
-            progressbar.SimpleProgress(sep="/"), " (",
-            progressbar.Percentage(), ') ',
-            progressbar.Bar(marker=progressbar.RotatingMarker()), ' ',
-            progressbar.ETA()
-        ]
-        pbar = progressbar.ProgressBar(
-            widgets=widgets,
-            maxval=len(keys)
-        ).start()
+    pbar = pyprind.ProgBar(len(keys), title="Activities:")
 
     # Actual calculations
-    for index, key in enumerate(keys):
+    for key in keys:
         lca.redo_lcia({key: 1})
         if lca.score == 0.:
             continue
@@ -89,11 +79,9 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         assert fill_number < all_cutoff, "Too many values in 'all'"
         results['all'][:fill_number, col] = results_all
 
-        if progress:
-            pbar.update(index)
+        pbar.update()
 
-    if progress:
-        pbar.finish()
+    print(pbar)
 
     lca.fix_dictionaries()
     return results, lca.activity_dict, time() - start
@@ -130,7 +118,7 @@ def group_by_emissions(method):
             )
         if key[0] != config.biosphere:
             # Alternative biosphere, e.g. Ecoinvent 3. Add new biosphere DB
-            biosphere.update(**Database(key[0]).load())
+            biosphere.update(Database(key[0]).load())
         flow = biosphere[key]
         label = (
             flow.get("name", "Unknown"),

@@ -13,6 +13,14 @@ def tupify(o):
     return (-1 * o['impact'], o['from'], o['to'], o['amount'], o['exc_amount'])
 
 
+def iteritems(dct):
+    """Py2 & 3 compatible iteration of key/value pairs in dict"""
+    try:
+        return dct.viewitems()
+    except AttributeError:
+        return dct.items()
+
+
 class GTManipulator(object):
     """Manipulate ``GraphTraversal`` results."""
     @staticmethod
@@ -42,7 +50,7 @@ class GTManipulator(object):
             to_node = nodes[to]
             new_amount = exc_amount * to_node['amount']
 
-            node_id = counter.next()
+            node_id = next(counter)
             # Only node that doesn't have a ``row`` attribute is the
             # functional unit, which by definition has no outgoing links
             nodes[node_id] = {
@@ -79,7 +87,7 @@ class GTManipulator(object):
         """Add metadata to nodes, like name, unit, and category."""
         ra, rp, rb = lca.reverse_dict()
         new_nodes = {}
-        for key, value in nodes.iteritems():
+        for key, value in iteritems(nodes):
             new_value = copy.deepcopy(value)
             if key == -1:
                 new_value.update({
@@ -108,7 +116,7 @@ class GTManipulator(object):
         """Reformat to D3 style, which is a list of nodes, and edge ids are node list indices."""
         # Sort node ids by highest cumulative score first
         node_ids = [x[1] for x in sorted(
-            [(v["cum"], k) for k, v in nodes.iteritems()])]
+            [(v["cum"], k) for k, v in iteritems(nodes)])]
         new_nodes = [nodes[i] for i in node_ids]
         lookup = dict([(key, index) for index, key in enumerate(node_ids)])
         new_edges = [{
@@ -130,11 +138,11 @@ class GTManipulator(object):
         if isinstance(limit, int) and limit > 1:
             nodes_to_delete = sorted([
                 (value['amount'] * value['ind'], key)
-                for key, value in nodes.iteritems()
+                for key, value in iteritems(nodes)
                 ], reverse=True)[limit:]
         else:
             nodes_to_delete = [
-                key for key, value in nodes.iteritems()
+                key for key, value in iteritems(nodes)
                 if key != -1
                 and (value['amount'] * value['ind']) < (score * limit)
             ]
@@ -172,7 +180,7 @@ class GTManipulator(object):
                 del edges_dict[key]
             for key in c_edges:
                 del edges_dict[key]
-        nodes = {key: value for key, value in nodes.iteritems()
+        nodes = {key: value for key, value in iteritems(nodes)
             if key not in set(nodes_to_delete)}
         return nodes, edges_dict.values()
 
@@ -182,7 +190,7 @@ class GTManipulator(object):
         edges = [e for e in edges if e["impact"] >= (score * limit)]
         good_nodes = set([e["from"] for e in edges]).union(
             set([e["to"] for e in edges]))
-        nodes = dict([(k, v) for k, v in nodes.iteritems() if k in good_nodes])
+        nodes = dict([(k, v) for k, v in iteritems(nodes) if k in good_nodes])
         return nodes, edges
 
     @staticmethod

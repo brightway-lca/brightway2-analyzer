@@ -20,6 +20,7 @@ except ImportError:
 class DatabaseHealthCheck(object):
     def __init__(self, database):
         self.db = Database(database)
+        self.db.filters = {'type': 'process'}
 
     def check(self, graphs_dir=None):
         tg, tfn, bg, bfn = self.make_graphs(graphs_dir)

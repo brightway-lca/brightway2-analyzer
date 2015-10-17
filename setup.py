@@ -2,13 +2,13 @@ from setuptools import setup
 
 setup(
     name='bw2analyzer',
-    version="0.9.dev0",
+    version="0.9.dev1",
     packages=["bw2analyzer", "bw2analyzer.tests"],
     author="Chris Mutel",
     author_email="cmutel@gmail.com",
     license=open('LICENSE.txt').read(),
     install_requires=[
-        "brightway2>=2.0.dev0",
+        "brightway2>=2.0.dev1",
         "numpy",
         "requests",
         "scipy",
@@ -26,7 +26,8 @@ setup(
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 2 :: Only',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Scientific/Engineering :: Information Analysis',
         'Topic :: Scientific/Engineering :: Mathematics',
         'Topic :: Scientific/Engineering :: Visualization',

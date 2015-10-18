@@ -8,7 +8,7 @@ setup(
     author_email="cmutel@gmail.com",
     license=open('LICENSE.txt').read(),
     install_requires=[
-        "brightway2>=2.0.dev1",
+        "brightway2>=2.0.dev2",
         "numpy",
         "requests",
         "scipy",

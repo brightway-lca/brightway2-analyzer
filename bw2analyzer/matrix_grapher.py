@@ -35,6 +35,9 @@ class SparseMatrixGrapher(object):
         if filename:
             plt.savefig(filename, dpi=dpi)
 
+    def magnitude_graph(self):
+        pass
+
     def ordered_graph(self, filename=None, dpi=600, width=None, height=None):
         if not reverse_cuthill_mckee:
             raise ImportError(u"Install scipy version >= 0.15")

@@ -35,13 +35,39 @@ class SparseMatrixGrapher(object):
         if filename:
             plt.savefig(filename, dpi=dpi)
 
-    def magnitude_graph(self):
-        pass
+    def magnitude_graph(self, filename=None, dpi=600, width=None, height=None):
+        def get_relative_scores(data):
+            return np.abs(data) / np.max(np.abs(data))
+
+        def get_colors(distances):
+            cmap = plt.get_cmap("Dark2")
+            return cmap(distances)
+
+        def unroll(data):
+            return [list(row) for row in data]
+
+        nm = reverse_cuthill_mckee(self.matrix)
+        ro = self.matrix[nm, :][:, nm]
+        as_coo = ro.tocoo()
+        y, x = as_coo.shape
+
+        colors = unroll(get_colors(get_relative_scores(as_coo.data)))
+
+        plt.figure(figsize=(width or x / 1000, height or y / 1000))
+        ax = plt.axes([0,0,1,1])
+        plt.scatter(list(as_coo.shape[1] - as_coo.col), list(as_coo.row),
+                    s=10, c=colors, marker=".", edgecolors="None")
+        ax.xaxis.set_ticks_position('none')
+        ax.yaxis.set_ticks_position('none')
+        ax.xaxis.set_ticklabels([])
+        ax.yaxis.set_ticklabels([])
+        ax.set_ylim((0, self.matrix.shape[0]))
+        ax.set_xlim((0, self.matrix.shape[1]))
+        plt.box(False)
+        if filename:
+            plt.savefig(filename, dpi=dpi)
 
     def ordered_graph(self, filename=None, dpi=600, width=None, height=None):
-        if not reverse_cuthill_mckee:
-            raise ImportError(u"Install scipy version >= 0.15")
-
         def get_distances(xs, ys):
             z = np.abs(xs - ys) / 2
             return np.sqrt(2 * z ** 2) / MAX_DIST

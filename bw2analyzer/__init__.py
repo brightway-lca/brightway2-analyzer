@@ -8,7 +8,7 @@ __all__ = [
     'SerializedLCAReport',
 ]
 
-__version__ = (0, 9, "dev2")
+__version__ = (0, 9, "dev3")
 
 from .contribution import ContributionAnalysis
 from .explorer import DatabaseExplorer

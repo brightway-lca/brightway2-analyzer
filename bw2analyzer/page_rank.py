@@ -18,7 +18,6 @@ class PageRank(object):
     def calculate(self):
         self.lca = LCA({self.database.random(): 1})
         self.lca.lci()
-        self.lca.fix_dictionaries()
         self.ra, _, _ = self.lca.reverse_dict()
         self.matrix = self.lca.technosphere_matrix.transpose()
         self.pr = [

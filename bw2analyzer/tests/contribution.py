@@ -99,7 +99,6 @@ class Contribution2TestCase(BW2DataTest):
         lca = LCA({("a", "2"): 1}, ('method',))
         lca.lci()
         lca.lcia()
-        lca.fix_dictionaries()
         CA().hinton_matrix(lca, 2, 2)
 
     def test_d3_treemap_no_error(self):
@@ -107,6 +106,5 @@ class Contribution2TestCase(BW2DataTest):
         lca = LCA({("a", "2"): 1}, ('method',))
         lca.lci()
         lca.lcia()
-        lca.fix_dictionaries()
         ra, rp, rb = lca.reverse_dict()
         CA().d3_treemap(lca.characterized_inventory, rb, ra)

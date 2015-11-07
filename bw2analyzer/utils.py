@@ -83,7 +83,6 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
 
     print(pbar)
 
-    lca.fix_dictionaries()
     return results, lca.activity_dict, time() - start
 
 

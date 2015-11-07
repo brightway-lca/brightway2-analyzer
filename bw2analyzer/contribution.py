@@ -130,8 +130,6 @@ Returns:
         Returns a list of tuples: ``(lca score, supply, name)``. If ``names`` is False, they returns the process key as the last element.
 
         """
-        if lca._mapped_dict:
-            lca.fix_dictionaries()
         ra, rp, rb = lca.reverse_dict()
         results = [(score, lca.supply_array[index], ra[index])
                    for score, index in self.top_processes(
@@ -147,8 +145,6 @@ Returns:
         Returns a list of tuples: ``(lca score, inventory amount, name)``. If ``names`` is False, they returns the process key as the last element.
 
         """
-        if lca._mapped_dict:
-            lca.fix_dictionaries()
         ra, rp, rb = lca.reverse_dict()
         results = [(score, lca.inventory[index, :].sum(), rb[index])
                    for score, index in self.top_emissions(

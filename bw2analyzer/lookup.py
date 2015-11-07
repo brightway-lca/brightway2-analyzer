@@ -11,7 +11,6 @@ class ParameterFinder(object):
     def __init__(self, lca):
         assert isinstance(lca, LCA), "Must provide ``LCA`` object as input"
         self.lca = lca
-        self.lca.fix_dictionaries()
         self.ra, self.rp, self.rb = self.lca.reverse_dict()
 
     def find_technosphere(self, row, col):

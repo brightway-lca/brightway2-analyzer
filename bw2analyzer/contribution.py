@@ -100,7 +100,7 @@ Returns:
             for col, y in enumerate(top_cols):
                 if matrix[x, y] != 0:
                     elements.append((x, y, row, col, float(matrix[x, y])))
-        return elements, top_rows, top_cols
+        return elements, top_rows.astype(int), top_cols.astype(int)
 
     def hinton_matrix(self, lca, rows=5, cols=5):
         coo, b, t = self.top_matrix(lca.characterized_inventory,
@@ -131,7 +131,7 @@ Returns:
 
         """
         ra, rp, rb = lca.reverse_dict()
-        results = [(score, lca.supply_array[index], ra[index])
+        results = [(score, lca.supply_array[int(index)], ra[int(index)])
                    for score, index in self.top_processes(
                    lca.characterized_inventory, **kwargs)]
         if names:
@@ -155,7 +155,7 @@ Returns:
         return results
 
     def get_name(self, key):
-        return get_activity(key)['name']
+        return get_activity(key).get('name', 'Unknown')
 
     def d3_treemap(self, matrix, rev_bio, rev_techno, limit=0.025,
                    limit_type="percent"):

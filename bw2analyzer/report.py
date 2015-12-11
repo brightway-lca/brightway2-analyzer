@@ -5,7 +5,7 @@ from eight import *
 from .contribution import ContributionAnalysis
 from .econ import herfindahl_index, concentration_ratio
 from .sc_graph import GTManipulator
-from brightway2 import JsonWrapper, methods, config, projects
+from brightway2 import JsonWrapper, methods, config, projects, get_activity
 from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
 from scipy.stats import gaussian_kde
 import numpy as np
@@ -35,8 +35,7 @@ class SerializedLCAReport(object):
 
         gt = GraphTraversal().calculate(self.activity, method=self.method)
         print("FD")
-        force_directed = None
-        # force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
+        force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
         print("CA")
         ca = ContributionAnalysis()
         print("hinton")
@@ -50,9 +49,13 @@ class SerializedLCAReport(object):
         print("MC:")
         monte_carlo = self.get_monte_carlo()
 
+        activity_data = []
+        for k, v in self.activity.items():
+            obj = get_activity(k)
+            activity_data.append((obj['name'], "%.2g" % v, obj['unit']))
+
         self.report = {
-            "activity": [(ca.get_name(k), "%.2g" % v, ca.db_names[k[0]][k][
-                "unit"]) for k, v in self.activity.items()],
+            "activity": activity_data,
             "method": {
                 "name": ": ".join(self.method),
                 "unit": methods[self.method]["unit"]

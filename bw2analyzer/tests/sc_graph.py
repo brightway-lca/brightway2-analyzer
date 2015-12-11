@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals, division
 from eight import *
 
-from ..sc_graph import GTManipulator, iteritems
+from ..sc_graph import GTManipulator
 from bw2data import (
     Database,
     databases,
@@ -299,7 +299,7 @@ class SimplifyTestCase(unittest.TestCase):
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 2, 0.1)
         self.assertEqual(
             new_nodes,
-            {key: value for key, value in iteritems(nodes) if key in (1, 3)}
+            {key: value for key, value in nodes.items() if key in (1, 3)}
         )
         self.assertEqual(
             list(new_edges),
@@ -328,7 +328,7 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 4, 'amount': 2, 'exc_amount': 2, 'impact': 3},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 9, 0.1)
-        expected_nodes = {key: value for key, value in iteritems(nodes)
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
@@ -351,7 +351,7 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 4, 'amount': 2, 'exc_amount': 2, 'impact': 3},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 9, 0.1)
-        expected_nodes = {key: value for key, value in iteritems(nodes)
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
@@ -383,7 +383,7 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 4, 'amount': 3, 'exc_amount': 1, 'impact': 3},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 5, 0.1)
-        expected_nodes = {key: value for key, value in iteritems(nodes)
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 4)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [
@@ -414,7 +414,7 @@ class SimplifyTestCase(unittest.TestCase):
             {'to': 3, 'from': 5, 'amount': 12, 'exc_amount': 4, 'impact': 24},
         ]
         new_nodes, new_edges = GTManipulator.simplify(nodes, edges, 53, 0.01)
-        expected_nodes = {key: value for key, value in iteritems(nodes)
+        expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4, 5)}
         self.assertEqual(expected_nodes, new_nodes)
         expected_edges = [

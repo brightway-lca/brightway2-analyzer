@@ -13,14 +13,6 @@ def tupify(o):
     return (-1 * o['impact'], o['from'], o['to'], o['amount'], o['exc_amount'])
 
 
-def iteritems(dct):
-    """Py2 & 3 compatible iteration of key/value pairs in dict"""
-    try:
-        return dct.viewitems()
-    except AttributeError:
-        return dct.items()
-
-
 class GTManipulator(object):
     """Manipulate ``GraphTraversal`` results."""
     @staticmethod
@@ -87,7 +79,7 @@ class GTManipulator(object):
         """Add metadata to nodes, like name, unit, and category."""
         ra, rp, rb = lca.reverse_dict()
         new_nodes = {}
-        for key, value in iteritems(nodes):
+        for key, value in nodes.items():
             new_value = copy.deepcopy(value)
             if key == -1:
                 new_value.update({
@@ -116,7 +108,7 @@ class GTManipulator(object):
         """Reformat to D3 style, which is a list of nodes, and edge ids are node list indices."""
         # Sort node ids by highest cumulative score first
         node_ids = [x[1] for x in sorted(
-            [(v["cum"], k) for k, v in iteritems(nodes)])]
+            [(v["cum"], k) for k, v in nodes.items()])]
         new_nodes = [nodes[i] for i in node_ids]
         lookup = dict([(key, index) for index, key in enumerate(node_ids)])
         new_edges = [{
@@ -138,11 +130,11 @@ class GTManipulator(object):
         if isinstance(limit, int) and limit > 1:
             nodes_to_delete = sorted([
                 (value['amount'] * value['ind'], key)
-                for key, value in iteritems(nodes)
+                for key, value in nodes.items()
                 ], reverse=True)[limit:]
         else:
             nodes_to_delete = [
-                key for key, value in iteritems(nodes)
+                key for key, value in nodes.items()
                 if key != -1
                 and (value['amount'] * value['ind']) < (score * limit)
             ]
@@ -180,7 +172,7 @@ class GTManipulator(object):
                 del edges_dict[key]
             for key in c_edges:
                 del edges_dict[key]
-        nodes = {key: value for key, value in iteritems(nodes)
+        nodes = {key: value for key, value in nodes.items()
             if key not in set(nodes_to_delete)}
         return nodes, edges_dict.values()
 
@@ -190,7 +182,7 @@ class GTManipulator(object):
         edges = [e for e in edges if e["impact"] >= (score * limit)]
         good_nodes = set([e["from"] for e in edges]).union(
             set([e["to"] for e in edges]))
-        nodes = dict([(k, v) for k, v in iteritems(nodes) if k in good_nodes])
+        nodes = dict([(k, v) for k, v in nodes.items() if k in good_nodes])
         return nodes, edges
 
     @staticmethod
@@ -202,14 +194,14 @@ class GTManipulator(object):
 
         counter = itertools.count(1)
 
-        def format_node(node_key, node_data, rt):
+        def format_node(node_key, node_data, ra):
             if node_key == -1:
                 return {
                     'name': 'Functional unit',
                     'unit': 'unit',
                     'location': config.global_location,
                     'categories': "",
-                    'id': counter.next(),
+                    'id': next(counter),
                     'amount': 1.
                 }
 
@@ -222,12 +214,12 @@ class GTManipulator(object):
                 'unit': ds.get('unit', "Unknown"),
                 'location': ds.get('location', "Unknown"),
                 'categories': ", ".join(ds.get('categories', [])),
-                'id': counter.next(),
+                'id': next(counter),
                 'amount': node_data['amount']
             }
 
-        def format_child_node(node_key, node_data, rt, add_biosphere):
-            ds = format_node(node_key, node_data, rt)
+        def format_child_node(node_key, node_data, ra, add_biosphere):
+            ds = format_node(node_key, node_data, ra)
             ds['size'] = node_data['cum']
             ds['variance'] = 0.5
             return ds
@@ -235,10 +227,10 @@ class GTManipulator(object):
         def process_node(node):
             cn = child_nodes(node, edges)
             if cn:
-                ds = format_node(node, nodes[node], rt)
+                ds = format_node(node, nodes[node], ra)
                 ds['children'] = [process_node(o) for o in cn]
                 return ds
             else:
-                return format_child_node(node, nodes[node], rt, False)
+                return format_child_node(node, nodes[node], ra, False)
 
         return process_node(-1)

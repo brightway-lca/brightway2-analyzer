@@ -35,7 +35,8 @@ class SerializedLCAReport(object):
 
         gt = GraphTraversal().calculate(self.activity, method=self.method)
         print("FD")
-        force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
+        force_directed = None
+        # force_directed = self.get_force_directed(gt['nodes'], gt['edges'], lca)
         print("CA")
         ca = ContributionAnalysis()
         print("hinton")
@@ -51,7 +52,7 @@ class SerializedLCAReport(object):
 
         self.report = {
             "activity": [(ca.get_name(k), "%.2g" % v, ca.db_names[k[0]][k][
-                "unit"]) for k, v in self.activity.iteritems()],
+                "unit"]) for k, v in self.activity.items()],
             "method": {
                 "name": ": ".join(self.method),
                 "unit": methods[self.method]["unit"]

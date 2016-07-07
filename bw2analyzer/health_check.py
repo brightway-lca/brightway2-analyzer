@@ -46,10 +46,16 @@ class DatabaseHealthCheck(object):
         lca = LCA({self.db.random(): 1})
         lca.lci()
         tech_filename = safe_filename(self.db.name) + u".technosphere.png"
-        tech_filepath = os.path.join(graphs_dir or projects.request_directory("export"), tech_filename)
+        tech_filepath = os.path.join(
+            graphs_dir or projects.output_dir,
+            tech_filename
+        )
         SparseMatrixGrapher(lca.technosphere_matrix).graph(tech_filepath, dpi=600)
         bio_filename = safe_filename(self.db.name) + u".biosphere.png"
-        bio_filepath = os.path.join(graphs_dir or projects.request_directory("export"), bio_filename)
+        bio_filepath = os.path.join(
+            graphs_dir or projects.output_dir,
+            bio_filename
+        )
         SparseMatrixGrapher(lca.biosphere_matrix).graph(bio_filepath, dpi=600)
         return tech_filepath, tech_filename, bio_filepath, bio_filename
 

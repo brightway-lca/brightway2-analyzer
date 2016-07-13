@@ -1,6 +1,19 @@
 Changelog
 *********
 
+Note: This changelog is not exhaustive. Each release also include small bug fixes and cleanups.
+
+0.9.1 (2016-07-14)
+==================
+
+* Compatibility with bw2data 2.3
+
+0.9 (2016-04-09)
+================
+
+* Py3 compatibility
+* Updates for compatibility with downstream changes
+
 0.8 (2015-03-07)
 ================
 

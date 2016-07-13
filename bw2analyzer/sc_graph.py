@@ -93,7 +93,7 @@ class GTManipulator(object):
                 else:
                     index = key
                 code = ra[index]
-                ds = Database(code[0]).load()[code]
+                ds = Database(code[0]).get([code[1]]).as_dict()
                 new_value.update({
                     'name': ds.get('name', "Unknown"),
                     'categories': ds.get('categories', []),
@@ -208,7 +208,7 @@ class GTManipulator(object):
             if 'row' in node_data:
                 node_key = node_data['row']
             key = ra[node_key]
-            ds = Database(key[0]).load()[key]
+            ds = Database(key[0]).get([key[1]]).as_dict()
             return {
                 'name': ds.get('name', "Unknown"),
                 'unit': ds.get('unit', "Unknown"),

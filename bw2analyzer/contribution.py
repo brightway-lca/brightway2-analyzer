@@ -127,7 +127,7 @@ Returns:
     def annotated_top_processes(self, lca, names=True, **kwargs):
         """Get list of most damaging processes in an LCA, sorted by ``abs(direct impact)``.
 
-        Returns a list of tuples: ``(lca score, supply, name)``. If ``names`` is False, they returns the process key as the last element.
+        Returns a list of tuples: ``(lca score, supply, activity)``. If ``names`` is False, they returns the process key as the last element.
 
         """
         ra, rp, rb = lca.reverse_dict()
@@ -135,14 +135,14 @@ Returns:
                    for score, index in self.top_processes(
                    lca.characterized_inventory, **kwargs)]
         if names:
-            results = [(x[0], x[1], self.get_name(x[2])) for x in results]
+            results = [(x[0], x[1], get_activity(x[2])) for x in results]
         return results
 
 
     def annotated_top_emissions(self, lca, names=True, **kwargs):
         """Get list of most damaging biosphere flows in an LCA, sorted by ``abs(direct impact)``.
 
-        Returns a list of tuples: ``(lca score, inventory amount, name)``. If ``names`` is False, they returns the process key as the last element.
+        Returns a list of tuples: ``(lca score, inventory amount, activity)``. If ``names`` is False, they returns the process key as the last element.
 
         """
         ra, rp, rb = lca.reverse_dict()
@@ -151,7 +151,7 @@ Returns:
                    lca.characterized_inventory, **kwargs)
         ]
         if names:
-            results = [(x[0], x[1], self.get_name(x[2])) for x in results]
+            results = [(x[0], x[1], get_activity(x[2])) for x in results]
         return results
 
     def get_name(self, key):

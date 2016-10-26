@@ -6,6 +6,7 @@ __all__ = [
     'GTManipulator',
     'PageRank',
     'SerializedLCAReport',
+    'traverse_tagged_databases',
 ]
 
 __version__ = (0, 9)
@@ -16,4 +17,4 @@ from .health_check import DatabaseHealthCheck
 from .page_rank import PageRank
 from .report import SerializedLCAReport
 from .sc_graph import GTManipulator
-
+from .tagged import traverse_tagged_databases

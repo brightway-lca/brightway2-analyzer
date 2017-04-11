@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 from eight import *
 
+from .matrix_grapher import SparseMatrixGrapher
 from .page_rank import PageRank
 from bw2calc import LCA
 from bw2data import Database, projects
@@ -9,12 +10,6 @@ from bw2data.utils import safe_filename
 from stats_arrays import *
 import numpy as np
 import os
-try:
-    from .matrix_grapher import SparseMatrixGrapher
-except ImportError:
-    import warnings
-    warnings.warn(u"Must have matplotlib installed for sparse matrix graph")
-    SparseMatrixGrapher = None
 
 
 class DatabaseHealthCheck(object):
@@ -41,8 +36,6 @@ class DatabaseHealthCheck(object):
         }
 
     def make_graphs(self, graphs_dir=None):
-        if not SparseMatrixGrapher:
-            return "", "", "", ""
         lca = LCA({self.db.random(): 1})
         lca.lci()
         tech_filename = safe_filename(self.db.name) + u".technosphere.png"

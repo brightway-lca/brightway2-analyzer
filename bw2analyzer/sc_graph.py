@@ -2,10 +2,10 @@
 from __future__ import print_function, unicode_literals
 from eight import *
 
+from bw2data import Database, config
+from heapq import heappush, heappop
 import copy
 import itertools
-from heapq import heappush, heappop
-from bw2data import Database, config
 
 
 def tupify(o):

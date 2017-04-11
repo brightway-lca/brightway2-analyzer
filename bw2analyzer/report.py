@@ -5,7 +5,7 @@ from eight import *
 from .contribution import ContributionAnalysis
 from .econ import herfindahl_index, concentration_ratio
 from .sc_graph import GTManipulator
-from brightway2 import JsonWrapper, methods, config, projects, get_activity
+from bw2data import JsonWrapper, methods, config, projects, get_activity
 from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
 from scipy.stats import gaussian_kde
 import numpy as np

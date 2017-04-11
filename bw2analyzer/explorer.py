@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 from eight import *
 
-from brightway2 import Database, databases
+from bw2data import Database, databases
 
 
 class DatabaseExplorer(object):

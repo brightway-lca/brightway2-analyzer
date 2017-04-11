@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 from eight import *
 
-from brightway2 import Database
+from bw2data import Database
 from bw2calc import LCA
 from numpy import array, ones, absolute, dot, where
 

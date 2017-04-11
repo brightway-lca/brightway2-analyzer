@@ -2,9 +2,9 @@
 from __future__ import print_function, unicode_literals, division
 from eight import *
 
-from time import time
 from bw2calc import LCA
 from bw2data import Database, methods, databases, mapping, Method, config
+from time import time
 import numpy as np
 import pyprind
 

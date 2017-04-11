@@ -3,14 +3,8 @@ from __future__ import print_function, unicode_literals, division
 from eight import *
 
 import numpy as np
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    raise ImportError("Must have matplotlib installed for SparseMatrixGrapher")
-try:
-    from scipy.sparse.csgraph import reverse_cuthill_mckee
-except ImportError:
-    reverse_cuthill_mckee = False
+import matplotlib.pyplot as plt
+from scipy.sparse.csgraph import reverse_cuthill_mckee
 
 
 class SparseMatrixGrapher(object):

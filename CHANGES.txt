@@ -3,6 +3,11 @@ Changelog
 
 Note: This changelog is not exhaustive. Each release also include small bug fixes and cleanups.
 
+0.9.3 (2017-04-11)
+==================
+
+* Cleaned up setup and license
+
 0.9.1 (2016-07-14)
 ==================
 

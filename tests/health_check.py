@@ -17,7 +17,7 @@ class HealthCheckTestCase(BW2DataTest):
     def test_health_check(self):
         db = Database("a")
         db.write(lci_fixture)
-        method = Method(('method',))
+        method = Method(("method",))
         method.register()
         method.write(method_fixture)
         dhc = DHCMock("a").check()

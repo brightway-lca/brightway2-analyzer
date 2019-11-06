@@ -14,15 +14,27 @@ class DatabaseExplorer(object):
 
     def uses_this_process(self, key, recursion=0):
         if recursion:
-            return dict([(k, self.uses_this_process(k, recursion - 1)) for \
-                k in self.data if key in [e["input"] for e in \
-                self.data[k].get("exchanges", [])]])
+            return dict(
+                [
+                    (k, self.uses_this_process(k, recursion - 1))
+                    for k in self.data
+                    if key in [e["input"] for e in self.data[k].get("exchanges", [])]
+                ]
+            )
         else:
-            return [k for k in self.data if key in [e["input"] for e in \
-                self.data[k].get("exchanges", [])]]
+            return [
+                k
+                for k in self.data
+                if key in [e["input"] for e in self.data[k].get("exchanges", [])]
+            ]
 
     def provides_this_process(self, key, recursion=0):
         if recursion:
-            return dict([(e["input"], self.provides_this_process(e["input"], recursion - 1)) for e in self.data[key].get("exchanges", [])])
+            return dict(
+                [
+                    (e["input"], self.provides_this_process(e["input"], recursion - 1))
+                    for e in self.data[key].get("exchanges", [])
+                ]
+            )
         else:
             return [(e["input"], ()) for e in self.data[key].get("exchanges", [])]

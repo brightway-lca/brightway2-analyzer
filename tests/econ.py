@@ -2,8 +2,12 @@
 from __future__ import print_function, unicode_literals, division
 from eight import *
 
-from bw2analyzer.econ import concentration_ratio, gini_coefficient, herfindahl_index, \
-    theil_index
+from bw2analyzer.econ import (
+    concentration_ratio,
+    gini_coefficient,
+    herfindahl_index,
+    theil_index,
+)
 import numpy as np
 import unittest
 
@@ -23,7 +27,7 @@ class EconometricsTestCase(unittest.TestCase):
         self.assertEqual(concentration_ratio(x, 2), 0.4)
 
     def test_herfindahl(self):
-        x = np.array((1., 1., 1.), dtype=float)
+        x = np.array((1.0, 1.0, 1.0), dtype=float)
         # Correct answer is 3 * (1/3) ^ 2 = 1/3
         self.assertEqual(herfindahl_index(x, False), 1 / 3)
         # Normalized it is zero (all values are the same)
@@ -39,8 +43,8 @@ class EconometricsTestCase(unittest.TestCase):
 
     def test_theil(self):
         # Include negative and zero values to test filtering
-        x = np.array((0., -2., 2., 6., 20.))
+        x = np.array((0.0, -2.0, 2.0, 6.0, 20.0))
         average = 30 / 4
-        y = np.array((2., 2., 6., 20.))
+        y = np.array((2.0, 2.0, 6.0, 20.0))
         answer = 1 / 4 * ((y / average) * np.log(y / average)).sum()
         self.assertAlmostEqual(float(answer), theil_index(x))

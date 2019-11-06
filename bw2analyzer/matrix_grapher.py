@@ -61,8 +61,7 @@ class SparseMatrixGrapher(object):
         if filename:
             plt.savefig(filename, dpi=dpi)
 
-    def ordered_graph(self, filename=None, dpi=600, width=None, height=None,
-                      colors=True):
+    def ordered_graph(self, filename=None, dpi=600, width=None, height=None):
         def get_distances(xs, ys):
             z = np.abs(xs - ys) / 2
             return np.sqrt(2 * z ** 2) / MAX_DIST
@@ -80,20 +79,12 @@ class SparseMatrixGrapher(object):
         y, x = as_coo.shape
         MAX_DIST = np.sqrt(2 * (x / 2.) ** 2)
 
-        kwargs = {
-            "s": 10,
-            "marker": ".",
-            "edgecolors": "None"
-        }
-
-        if colors is True:
-            kwargs['c'] = unroll(get_colors(get_distances(as_coo.col, as_coo.row)))
-        elif colors:
-            kwargs['c'] = colors
+        colors = unroll(get_colors(get_distances(as_coo.col, as_coo.row)))
 
         plt.figure(figsize=(width or x / 1000, height or y / 1000))
         ax = plt.axes([0,0,1,1])
-        plt.scatter(list(as_coo.shape[1] - as_coo.col), list(as_coo.row), **kwargs)
+        plt.scatter(list(as_coo.shape[1] - as_coo.col), list(as_coo.row),
+                    s=10, c=colors, marker=".", edgecolors="None")
         ax.xaxis.set_ticks_position('none')
         ax.yaxis.set_ticks_position('none')
         ax.xaxis.set_ticklabels([])

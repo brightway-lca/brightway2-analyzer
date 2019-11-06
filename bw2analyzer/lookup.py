@@ -8,6 +8,7 @@ from bw2calc import LCA
 
 class ParameterFinder(object):
     """Convenience class to find data about particular parameters, i.e. technosphere and biosphere exchanges and characterization factors."""
+
     def __init__(self, lca):
         assert isinstance(lca, LCA), "Must provide ``LCA`` object as input"
         self.lca = lca
@@ -19,19 +20,13 @@ class ParameterFinder(object):
         outp = self.ra[col]
         outp_data = Database(outp[0]).load()[outp]
         try:
-            exc = [x for x in outp_data.get("exchanges", []) if x['input'] == inp][0]
+            exc = [x for x in outp_data.get("exchanges", []) if x["input"] == inp][0]
         except IndexError:
             raise ValueError("Can't find this exchange")
         return {
-            'input': {
-                'key': inp,
-                'data': inp_data
-            },
-            'output': {
-                'key': outp,
-                'data': outp_data
-            },
-            'exchange': exc
+            "input": {"key": inp, "data": inp_data},
+            "output": {"key": outp, "data": outp_data},
+            "exchange": exc,
         }
 
     def find_biosphere(self, row, col):
@@ -40,19 +35,13 @@ class ParameterFinder(object):
         outp = self.ra[col]
         outp_data = Database(outp[0]).load()[outp]
         try:
-            exc = [x for x in outp_data.get("exchanges", []) if x['input'] == inp][0]
+            exc = [x for x in outp_data.get("exchanges", []) if x["input"] == inp][0]
         except IndexError:
             raise ValueError("Can't find this exchange")
         return {
-            'input': {
-                'key': inp,
-                'data': inp_data
-            },
-            'output': {
-                'key': outp,
-                'data': outp_data
-            },
-            'exchange': exc
+            "input": {"key": inp, "data": inp_data},
+            "output": {"key": outp, "data": outp_data},
+            "exchange": exc,
         }
 
     def find_characterization(self, row):
@@ -64,10 +53,4 @@ class ParameterFinder(object):
             cf = [x for x in method.load() if x[0] == flow][0][1]
         except:
             raise ValueError("Can't find this CF")
-        return {
-            'flow': {
-                'key': flow,
-                'data': flow_data
-            },
-            'cf': cf
-        }
+        return {"flow": {"key": flow, "data": flow_data}, "cf": cf}

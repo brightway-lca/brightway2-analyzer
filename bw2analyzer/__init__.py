@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*
 __all__ = [
-    'ContributionAnalysis',
-    'DatabaseExplorer',
-    'DatabaseHealthCheck',
-    'GTManipulator',
-    'PageRank',
-    'SerializedLCAReport',
-    'traverse_tagged_databases',
+    "ContributionAnalysis",
+    "DatabaseExplorer",
+    "DatabaseHealthCheck",
+    "GTManipulator",
+    "PageRank",
+    "SerializedLCAReport",
+    "traverse_tagged_databases",
 ]
 
 __version__ = (0, 9, 4)

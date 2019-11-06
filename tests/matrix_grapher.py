@@ -31,4 +31,6 @@ class MatrixGrapherTestCase(BW2DataTest):
 
     def test_ordered_graph(self):
         lca = self.get_lca()
-        SparseMatrixGrapher(lca.technosphere_matrix).ordered_graph("foo", width=2, height=2)
+        SparseMatrixGrapher(lca.technosphere_matrix).ordered_graph(
+            "foo", width=2, height=2
+        )

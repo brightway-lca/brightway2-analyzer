@@ -28,7 +28,7 @@ def gini_coefficient(x):
     y = np.cumsum(x)
     length = float(x.shape[0])
     B = y.sum() / (y[-1] * length)
-    return float(1. + 1 / length - 2 * B)
+    return float(1.0 + 1 / length - 2 * B)
 
 
 def herfindahl_index(x, normalize=True):

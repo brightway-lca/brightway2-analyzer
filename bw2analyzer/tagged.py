@@ -7,8 +7,9 @@ from bw2calc import LCA
 from collections import defaultdict
 
 
-def traverse_tagged_databases(functional_unit, method, label="tag",
-                              default_tag="other"):
+def traverse_tagged_databases(
+    functional_unit, method, label="tag", default_tag="other"
+):
     """Traverse a functional unit throughout its foreground database(s), and
     group impacts by tag label.
 
@@ -67,8 +68,10 @@ def traverse_tagged_databases(functional_unit, method, label="tag",
 
     method_dict = {o[0]: o[1] for o in Method(method).load()}
 
-    graph = [recurse_tagged_database(key, amount, method_dict, lca, label, default_tag)
-             for key, amount in functional_unit.items()]
+    graph = [
+        recurse_tagged_database(key, amount, method_dict, lca, label, default_tag)
+        for key, amount in functional_unit.items()
+    ]
 
     return aggregate_tagged_graph(graph), graph
 
@@ -83,11 +86,12 @@ def aggregate_tagged_graph(graph):
         {'a tag': summed LCIA scores}
 
     """
+
     def recursor(obj, scores):
-        scores[obj['tag']] += obj['impact']
-        for flow in obj['biosphere']:
-            scores[flow['tag']] += flow['impact']
-        for exc in obj['technosphere']:
+        scores[obj["tag"]] += obj["impact"]
+        for flow in obj["biosphere"]:
+            scores[flow["tag"]] += flow["impact"]
+        for exc in obj["technosphere"]:
             scores = recursor(exc, scores)
         return scores
 
@@ -131,11 +135,12 @@ def recurse_tagged_database(activity, amount, method_dict, lca, label, default_t
         activity = get_activity(activity)
 
     inputs = list(activity.technosphere())
-    inside = [exc for exc in inputs
-              if exc['input'][0] == activity['database']]
-    outside = {exc['input']: exc['amount'] * amount
-               for exc in inputs
-               if exc['input'][0] != activity['database']}
+    inside = [exc for exc in inputs if exc["input"][0] == activity["database"]]
+    outside = {
+        exc["input"]: exc["amount"] * amount
+        for exc in inputs
+        if exc["input"][0] != activity["database"]
+    }
 
     if outside:
         lca.redo_lcia(outside)
@@ -144,16 +149,22 @@ def recurse_tagged_database(activity, amount, method_dict, lca, label, default_t
         outside_score = 0
 
     return {
-        'activity': activity,
-        'amount': amount,
-        'tag': activity.get(label) or default_tag,
-        'impact': outside_score,
-        'biosphere': [{
-            'amount': exc['amount'] * amount,
-            'impact': exc['amount'] * amount * method_dict.get(exc['input'], 0),
-            'tag': exc.get(label) or activity.get(label) or default_tag
-        } for exc in activity.biosphere()],
-        'technosphere': [recurse_tagged_database(exc.input, exc['amount'] * amount,
-                                                 method_dict, lca, label, default_tag)
-                         for exc in inside]
+        "activity": activity,
+        "amount": amount,
+        "tag": activity.get(label) or default_tag,
+        "impact": outside_score,
+        "biosphere": [
+            {
+                "amount": exc["amount"] * amount,
+                "impact": exc["amount"] * amount * method_dict.get(exc["input"], 0),
+                "tag": exc.get(label) or activity.get(label) or default_tag,
+            }
+            for exc in activity.biosphere()
+        ],
+        "technosphere": [
+            recurse_tagged_database(
+                exc.input, exc["amount"] * amount, method_dict, lca, label, default_tag
+            )
+            for exc in inside
+        ],
     }

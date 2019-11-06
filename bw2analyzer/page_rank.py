@@ -20,10 +20,7 @@ class PageRank(object):
         self.lca.lci()
         self.ra, _, _ = self.lca.reverse_dict()
         self.matrix = self.lca.technosphere_matrix.transpose()
-        self.pr = [
-            (x[0], self.ra[x[1]])
-            for x in self.page_rank(self.matrix)
-        ]
+        self.pr = [(x[0], self.ra[x[1]]) for x in self.page_rank(self.matrix)]
         return self.pr
 
     def page_rank(self, technosphere, alpha=0.85, max_iter=100, tol=1e-6):
@@ -75,21 +72,21 @@ References
 
         mat = mat.tocsc()
         x = ones((n)) / n  # initial guess
-        dangle = array(where(mat.sum(axis=1) == 0, 1.0 / n,
-            0)).flatten()
+        dangle = array(where(mat.sum(axis=1) == 0, 1.0 / n, 0)).flatten()
         i = 0
 
         while True:  # power iteration: make up to max_iter iterations
             xlast = x
-            x = alpha * (x * mat + dot(dangle, xlast)) + (1 - alpha
-                ) * xlast.sum() / n
+            x = alpha * (x * mat + dot(dangle, xlast)) + (1 - alpha) * xlast.sum() / n
             # check convergence, l1 norm
             err = absolute(x - xlast).sum()
             if err < n * tol:
                 break
             if i > max_iter:
-                raise ConvergenceError("pagerank: power iteration "
-                    "failed to converge in %d iterations." % (i + 1))
+                raise ConvergenceError(
+                    "pagerank: power iteration "
+                    "failed to converge in %d iterations." % (i + 1)
+                )
             i += 1
 
         return sorted(zip(x, nodelist), reverse=True)

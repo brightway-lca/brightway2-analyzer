@@ -22,6 +22,7 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         Total elapsed time in seconds
 
     """
+
     def get_normalized_scores(lca, kind):
         if kind == "activities":
             data = lca.characterized_inventory.sum(axis=0)
@@ -56,9 +57,9 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
     all_cutoff = cols * 4
 
     results = {
-        'activities': np.zeros((cols, cols), dtype=np.float32),
-        'flows': np.zeros((rows, cols), dtype=np.float32),
-        'all': np.zeros((all_cutoff, cols), dtype=np.float32)
+        "activities": np.zeros((cols, cols), dtype=np.float32),
+        "flows": np.zeros((rows, cols), dtype=np.float32),
+        "all": np.zeros((all_cutoff, cols), dtype=np.float32),
     }
 
     pbar = pyprind.ProgBar(len(keys), title="Activities:")
@@ -66,18 +67,18 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
     # Actual calculations
     for key in keys:
         lca.redo_lcia({key: 1})
-        if lca.score == 0.:
+        if lca.score == 0.0:
             continue
 
         col = lca.activity_dict[mapping[key]]
-        results['activities'][:, col] = get_normalized_scores(lca, 'activities')
-        results['flows'][:, col] = get_normalized_scores(lca, 'flows')
-        results_all = get_normalized_scores(lca, 'all')
+        results["activities"][:, col] = get_normalized_scores(lca, "activities")
+        results["flows"][:, col] = get_normalized_scores(lca, "flows")
+        results_all = get_normalized_scores(lca, "all")
         results_all.sort()
         results_all = results_all[::-1]
         fill_number = results_all.shape[0]
         assert fill_number < all_cutoff, "Too many values in 'all'"
-        results['all'][:fill_number, col] = results_all
+        results["all"][:fill_number, col] = results_all
 
         pbar.update()
 
@@ -122,7 +123,7 @@ def group_by_emissions(method):
         label = (
             flow.get("name", "Unknown"),
             flow.get("categories", [""])[0],
-            flow.get("unit", "Unknown")
+            flow.get("unit", "Unknown"),
         )
         grouped.setdefault(label, []).append(cf)
 

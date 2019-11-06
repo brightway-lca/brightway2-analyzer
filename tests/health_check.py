@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 from eight import *
 
 from .fixtures import lci_fixture, method_fixture
-from ..health_check import DatabaseHealthCheck
+from bw2analyzer.health_check import DatabaseHealthCheck
 from bw2data import Database, Method
 from bw2data.tests import BW2DataTest
 

@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='bw2analyzer',
     version="0.9.4",
-    packages=["bw2analyzer", "bw2analyzer.tests"],
+    packages=["bw2analyzer"],
     author="Chris Mutel",
     author_email="cmutel@gmail.com",
     license=open('LICENSE.txt').read(),

@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 from eight import *
 
 from .fixtures import lci_fixture
-from ..matrix_grapher import SparseMatrixGrapher
+from bw2analyzer.matrix_grapher import SparseMatrixGrapher
 from bw2calc import LCA
 from bw2data import Database
 from bw2data.tests import BW2DataTest

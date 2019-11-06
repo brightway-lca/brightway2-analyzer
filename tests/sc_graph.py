@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals, division
 from eight import *
 
-from ..sc_graph import GTManipulator
+from bw2analyzer.sc_graph import GTManipulator
 from bw2data import (
     Database,
     databases,
@@ -307,7 +307,7 @@ class SimplifyTestCase(unittest.TestCase):
         )
 
     def test_y(self):
-        """Test supply chain graph like this:
+        r"""Test supply chain graph like this:
 
             o   o     o   o
              \ /       \ /
@@ -331,11 +331,11 @@ class SimplifyTestCase(unittest.TestCase):
         expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4)}
         self.assertEqual(expected_nodes, new_nodes)
-        expected_edges = [
+        expected_edges = sorted([
             {'to': 2, 'from': 4, 'amount': 1.6, 'exc_amount': 0.4, 'impact': 2},
             {'to': 1, 'from': 4, 'amount': 0.4, 'exc_amount': 0.4, 'impact': 1},
-        ]
-        self.assertEqual(expected_edges, list(new_edges))
+        ], key=lambda x: (x['to'], x['from']))
+        self.assertEqual(expected_edges, sorted(new_edges, key=lambda x: (x['to'], x['from'])))
 
     def test_no_self_edge(self):
         """Test that collapsed edges from a -> a are deleted."""
@@ -354,14 +354,14 @@ class SimplifyTestCase(unittest.TestCase):
         expected_nodes = {key: value for key, value in nodes.items()
             if key in (1, 2, 4)}
         self.assertEqual(expected_nodes, new_nodes)
-        expected_edges = [
+        expected_edges = sorted([
             {'to': 2, 'from': 4, 'amount': 1.6, 'exc_amount': 0.4, 'impact': 2},
             {'to': 1, 'from': 4, 'amount': 0.4, 'exc_amount': 0.4, 'impact': 1},
-        ]
-        self.assertEqual(expected_edges, list(new_edges))
+        ], key=lambda x: (x['to'], x['from']))
+        self.assertEqual(expected_edges, sorted(new_edges, key=lambda x: (x['to'], x['from'])))
 
     def test_diamond(self):
-        """Test supply chain graph like this:
+        r"""Test supply chain graph like this:
 
               o
              / \      o
@@ -392,7 +392,7 @@ class SimplifyTestCase(unittest.TestCase):
         self.assertEqual(expected_edges, list(new_edges))
 
     def test_x(self):
-        """Test supply chain graph like this:
+        r"""Test supply chain graph like this:
 
             o   o
              \ /      o  o

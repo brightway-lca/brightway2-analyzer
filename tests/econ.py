@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals, division
 from eight import *
 
-from ..econ import concentration_ratio, gini_coefficient, herfindahl_index, \
+from bw2analyzer.econ import concentration_ratio, gini_coefficient, herfindahl_index, \
     theil_index
 import numpy as np
 import unittest

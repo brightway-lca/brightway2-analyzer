@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 from eight import *
 
 from .fixtures import lci_fixture, method_fixture
-from ..contribution import ContributionAnalysis as CA
+from bw2analyzer.contribution import ContributionAnalysis as CA
 from bw2calc import LCA
 from bw2data import Method, Database
 from bw2data.tests import BW2DataTest

@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 from eight import *
 
-from ..utils import group_by_emissions
+from bw2analyzer.utils import group_by_emissions
 from bw2data import Database, Method
 from bw2data.tests import BW2DataTest
 

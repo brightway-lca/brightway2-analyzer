@@ -3,6 +3,12 @@ Changelog
 
 Note: This changelog is not exhaustive. Each release also include small bug fixes and cleanups.
 
+0.9.5 (2019-11-06)
+==================
+
+* Merge `PR #2 <https://bitbucket.org/cmutel/brightway2-analyzer/pull-requests/2/multiple-methods-secondary-tags-and/commits>`__, allowing for more powerful tagged graph traversal
+* Fix error in nonunitary production for ``traverse_tagged_databases``.
+
 0.9.4 (2017-04-17)
 ==================
 
@@ -36,7 +42,7 @@ Note: This changelog is not exhaustive. Each release also include small bug fixe
 Thanks Bernhard Steubing for good ideas and bugfixes.
 
 * ENHANCEMENT: Add amount to annotated top processes and emissions.
-* BUGFIX: Propagate **kwargs** in contribution analysis. 
+* BUGFIX: Propagate **kwargs** in contribution analysis.
 
 0.6.1 (2014-08-30)
 ==================

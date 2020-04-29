@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from eight import *
-
 from .matrix_grapher import SparseMatrixGrapher
 from .page_rank import PageRank
 from bw2calc import LCA

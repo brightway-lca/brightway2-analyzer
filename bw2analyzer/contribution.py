@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
-from eight import *
-
 from bw2data import Database, get_activity
 import numpy as np
 

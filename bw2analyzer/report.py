@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
-from eight import *
-
 from .contribution import ContributionAnalysis
 from .econ import herfindahl_index, concentration_ratio
 from .sc_graph import GTManipulator

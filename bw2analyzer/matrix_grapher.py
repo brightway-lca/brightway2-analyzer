@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
-from eight import *
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse.csgraph import reverse_cuthill_mckee

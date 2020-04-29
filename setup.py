@@ -10,7 +10,6 @@ setup(
     install_requires=[
         "bw2calc",
         "bw2data",
-        "eight",
         "matplotlib",
         "numpy",
         "pyprind",

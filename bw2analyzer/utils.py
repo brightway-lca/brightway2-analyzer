@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
-from eight import *
-
 from bw2calc import LCA
 from bw2data import Database, methods, databases, mapping, Method, config
 from time import time

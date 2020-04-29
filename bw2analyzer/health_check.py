@@ -2,7 +2,7 @@ from .matrix_grapher import SparseMatrixGrapher
 from .page_rank import PageRank
 from bw2calc import LCA
 from bw2data import Database, projects
-from bw2data.utils import safe_filename
+from bw_processing import safe_filename
 from stats_arrays import *
 import numpy as np
 import os

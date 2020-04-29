@@ -1,4 +1,4 @@
-from bw2data import databases, methods, get_activity, Method
+from bw2data import get_activity, Method
 from bw2calc import LCA
 from collections import defaultdict
 

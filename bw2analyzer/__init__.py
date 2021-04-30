@@ -9,8 +9,7 @@ __all__ = [
     "traverse_tagged_databases",
 ]
 
-__version__ = (0, 9, 4)
-
+from .version import version as __version__
 from .contribution import ContributionAnalysis
 from .explorer import DatabaseExplorer
 from .health_check import DatabaseHealthCheck

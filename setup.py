@@ -1,8 +1,15 @@
 from setuptools import setup
 
+
+v_temp = {}
+with open("bw2analyzer/version.py") as fp:
+    exec(fp.read(), v_temp)
+version = ".".join((str(x) for x in v_temp["version"]))
+
+
 setup(
     name="bw2analyzer",
-    version="0.9.4",
+    version=version,
     packages=["bw2analyzer"],
     author="Chris Mutel",
     author_email="cmutel@gmail.com",
@@ -12,10 +19,12 @@ setup(
         "bw2data",
         "matplotlib",
         "numpy",
+        "pandas",
         "pyprind",
         "requests",
         "scipy",
         "stats_arrays",
+        "tabulate",
     ],
     long_description=open("README.rst").read(),
     url="https://bitbucket.org/cmutel/brightway2-analyzer",

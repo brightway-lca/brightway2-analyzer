@@ -5,6 +5,8 @@ __all__ = [
     "DatabaseHealthCheck",
     "GTManipulator",
     "PageRank",
+    "print_recursive_calculation",
+    "print_recursive_supply_chain",
     "SerializedLCAReport",
     "traverse_tagged_databases",
 ]
@@ -17,3 +19,4 @@ from .page_rank import PageRank
 from .report import SerializedLCAReport
 from .sc_graph import GTManipulator
 from .tagged import traverse_tagged_databases
+from .utils import print_recursive_calculation, print_recursive_supply_chain

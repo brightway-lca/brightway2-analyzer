@@ -2,7 +2,6 @@ from .matrix_grapher import SparseMatrixGrapher
 from .page_rank import PageRank
 from bw2calc import LCA
 from bw2data import Database, projects
-from bw_processing import safe_filename
 from stats_arrays import *
 import numpy as np
 import os
@@ -34,10 +33,10 @@ class DatabaseHealthCheck(object):
     def make_graphs(self, graphs_dir=None):
         lca = LCA({self.db.random(): 1})
         lca.lci()
-        tech_filename = safe_filename(self.db.name) + ".technosphere.png"
+        tech_filename = self.db.filename + ".technosphere.png"
         tech_filepath = os.path.join(graphs_dir or projects.output_dir, tech_filename)
         SparseMatrixGrapher(lca.technosphere_matrix).graph(tech_filepath, dpi=600)
-        bio_filename = safe_filename(self.db.name) + ".biosphere.png"
+        bio_filename = self.db.filename + ".biosphere.png"
         bio_filepath = os.path.join(graphs_dir or projects.output_dir, bio_filename)
         SparseMatrixGrapher(lca.biosphere_matrix).graph(bio_filepath, dpi=600)
         return tech_filepath, tech_filename, bio_filepath, bio_filename

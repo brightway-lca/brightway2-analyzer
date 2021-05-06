@@ -5,34 +5,34 @@ import numpy as np
 class ContributionAnalysis(object):
     def sort_array(self, data, limit=25, limit_type="number", total=None):
         """
-Common sorting function for all ``top`` methods. Sorts by highest value first.
+        Common sorting function for all ``top`` methods. Sorts by highest value first.
 
-Operates in either ``number`` or ``percent`` mode. In ``number`` mode, return ``limit`` values. In ``percent`` mode, return all values >= (total * limit); where ``0 < limit <= 1``.
+        Operates in either ``number`` or ``percent`` mode. In ``number`` mode, return ``limit`` values. In ``percent`` mode, return all values >= (total * limit); where ``0 < limit <= 1``.
 
-Returns 2-d numpy array of sorted values and row indices, e.g.:
+        Returns 2-d numpy array of sorted values and row indices, e.g.:
 
-.. code-block:: python
+        .. code-block:: python
 
-    ContributionAnalysis().sort_array((1., 3., 2.))
+            ContributionAnalysis().sort_array((1., 3., 2.))
 
-returns
+        returns
 
-.. code-block:: python
+        .. code-block:: python
 
-    (
-        (3, 1),
-        (2, 2),
-        (1, 0)
-    )
+            (
+                (3, 1),
+                (2, 2),
+                (1, 0)
+            )
 
-Args:
-    * *data* (numpy array): A 1-d array of values to sort.
-    * *limit* (number, default=25): Number of values to return, or percentage cutoff.
-    * *limit_type* (str, default=``number``): Either ``number`` or ``percent``.
-    * *total* (number, default=None): Optional specification of summed data total.
+        Args:
+            * *data* (numpy array): A 1-d array of values to sort.
+            * *limit* (number, default=25): Number of values to return, or percentage cutoff.
+            * *limit_type* (str, default=``number``): Either ``number`` or ``percent``.
+            * *total* (number, default=None): Optional specification of summed data total.
 
-Returns:
-    2-d numpy array of values and row indices.
+        Returns:
+            2-d numpy array of values and row indices.
 
         """
         total = total or np.abs(data).sum()
@@ -50,44 +50,43 @@ Returns:
 
     def top_matrix(self, matrix, rows=5, cols=5):
         """
-Find most important (i.e. highest summed) rows and columns in a matrix, as well as the most corresponding non-zero individual elements in the top rows and columns.
+        Find most important (i.e. highest summed) rows and columns in a matrix, as well as the most corresponding non-zero individual elements in the top rows and columns.
 
-Only returns matrix values which are in the top rows and columns. Element values are returned as a tuple: ``(row, col, row index in top rows, col index in top cols, value)``.
+        Only returns matrix values which are in the top rows and columns. Element values are returned as a tuple: ``(row, col, row index in top rows, col index in top cols, value)``.
 
-Example:
+        Example:
 
-.. code-block:: python
+        .. code-block:: python
 
-    matrix = [
-        [0, 0, 1, 0],
-        [2, 0, 4, 0],
-        [3, 0, 1, 1],
-        [0, 7, 0, 1],
-    ]
+            matrix = [
+                [0, 0, 1, 0],
+                [2, 0, 4, 0],
+                [3, 0, 1, 1],
+                [0, 7, 0, 1],
+            ]
 
-In this matrix, the row sums are ``(1, 6, 5, 8)``, and the columns sums are ``(5, 7, 6, 2)``. Therefore, the top rows are ``(3, 1)`` and the top columns are ``(1, 2)``. The result would therefore be:
+        In this matrix, the row sums are ``(1, 6, 5, 8)``, and the columns sums are ``(5, 7, 6, 2)``. Therefore, the top rows are ``(3, 1)`` and the top columns are ``(1, 2)``. The result would therefore be:
 
-.. code-block:: python
+        .. code-block:: python
 
-    (
-        (
-            (3, 1, 0, 0, 7),
-            (3, 2, 0, 1, 1),
-            (1, 2, 1, 1, 4)
-        ),
-        (3, 1),
-        (1, 2)
-    )
+            (
+                (
+                    (3, 1, 0, 0, 7),
+                    (3, 2, 0, 1, 1),
+                    (1, 2, 1, 1, 4)
+                ),
+                (3, 1),
+                (1, 2)
+            )
 
-Args:
-    * *matrix* (array or matrix): Any Python object that supports the ``.sum(axis=)`` syntax.
-    * *rows* (int): Number of rows to select.
-    * *cols* (int): Number of columns to select.
+        Args:
+            * *matrix* (array or matrix): Any Python object that supports the ``.sum(axis=)`` syntax.
+            * *rows* (int): Number of rows to select.
+            * *cols* (int): Number of columns to select.
 
-Returns:
-    (elements, top rows, top columns)
-
-"""
+        Returns:
+            (elements, top rows, top columns)
+        """
         top_rows = np.argsort(np.abs(np.array(matrix.sum(axis=1)).ravel()))[
             : -rows - 1 : -1
         ]
@@ -167,20 +166,20 @@ Returns:
         self, matrix, rev_bio, rev_techno, limit=0.025, limit_type="percent"
     ):
         """
-Construct treemap input data structure for LCA result. Output like:
+        Construct treemap input data structure for LCA result. Output like:
 
-.. code-block:: python
+        .. code-block:: python
 
-    {
-    "name": "LCA result",
-    "children": [{
-        "name": process 1,
-        "children": [
-            {"name": emission 1, "size": score},
-            {"name": emission 2, "size": score},
-            ],
-        }]
-    }
+            {
+            "name": "LCA result",
+            "children": [{
+                "name": process 1,
+                "children": [
+                    {"name": emission 1, "size": score},
+                    {"name": emission 2, "size": score},
+                    ],
+                }]
+            }
 
         """
         total = np.abs(matrix).sum()

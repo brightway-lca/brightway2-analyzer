@@ -126,7 +126,19 @@ def group_by_emissions(method):
     return grouped
 
 
-def print_recursive_calculation(activity, lcia_method, amount=1, max_level=3, cutoff=1e-2, file_obj=None, tab_character="  ", level=0, lca_obj=None, total_score=None, first=True, ):
+def print_recursive_calculation(
+    activity,
+    lcia_method,
+    amount=1,
+    max_level=3,
+    cutoff=1e-2,
+    file_obj=None,
+    tab_character="  ",
+    level=0,
+    lca_obj=None,
+    total_score=None,
+    first=True,
+):
     """Traverse a supply chain graph, and calculate the LCA scores of each component. Prints the result with the format:
 
     {tab_character * level }{fraction of total score} ({absolute LCA score for this input} | {amount of input}) {input activity}
@@ -168,7 +180,13 @@ def print_recursive_calculation(activity, lcia_method, amount=1, max_level=3, cu
             file_obj.write(message + "\n")
         else:
             print(message)
-    message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(tab_character * level, lca_obj.score / total_score, lca_obj.score, float(amount), str(activity))
+    message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(
+        tab_character * level,
+        lca_obj.score / total_score,
+        lca_obj.score,
+        float(amount),
+        str(activity),
+    )
     if file_obj is not None:
         file_obj.write(message + "\n")
     else:
@@ -178,7 +196,7 @@ def print_recursive_calculation(activity, lcia_method, amount=1, max_level=3, cu
             print_recursive_calculation(
                 activity=exc.input,
                 lcia_method=lcia_method,
-                amount=amount * exc['amount'],
+                amount=amount * exc["amount"],
                 max_level=max_level,
                 cutoff=cutoff,
                 first=False,
@@ -190,7 +208,15 @@ def print_recursive_calculation(activity, lcia_method, amount=1, max_level=3, cu
             )
 
 
-def print_recursive_supply_chain(activity, amount=1, max_level=2, cutoff=0, file_obj=None, tab_character="  ", level=0):
+def print_recursive_supply_chain(
+    activity,
+    amount=1,
+    max_level=2,
+    cutoff=0,
+    file_obj=None,
+    tab_character="  ",
+    level=0,
+):
     """Traverse a supply chain graph, and prints the inputs of each component.
 
     This function is only for exploration; use ``bw2calc.GraphTraversal`` for a better performing function.
@@ -220,7 +246,7 @@ def print_recursive_supply_chain(activity, amount=1, max_level=2, cutoff=0, file
         for exc in activity.technosphere():
             print_recursive_supply_chain(
                 activity=exc.input,
-                amount=amount * exc['amount'],
+                amount=amount * exc["amount"],
                 level=level + 1,
                 max_level=max_level,
                 cutoff=cutoff,

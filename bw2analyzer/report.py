@@ -114,7 +114,13 @@ class SerializedLCAReport(object):
         print("Histogram")
         hist_ys, hist_xs = np.histogram(mc_data, bins=num_bins, density=True)
         hist_xs = np.repeat(hist_xs, 2)
-        hist_ys = np.hstack((np.array(0), np.repeat(hist_ys, 2), np.array(0),))
+        hist_ys = np.hstack(
+            (
+                np.array(0),
+                np.repeat(hist_ys, 2),
+                np.array(0),
+            )
+        )
         print("Finished .get_monte_carlo")
         return {
             "smoothed": zip(kde_xs.tolist(), kde_ys.tolist()),

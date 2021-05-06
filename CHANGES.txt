@@ -3,6 +3,15 @@ Changelog
 
 Note: This changelog is not exhaustive. Each release also include small bug fixes and cleanups.
 
+0.10 (2021-05-06)
+=================
+
+* Add `compare_activities_by_grouped_leaves` function.
+* Add `find_differences_in_inputs` function.
+* Add `compare_activities_by_lcia_score` function.
+* Add `print_recursive_calculation` and `print_recursive_supply_chain` utility functions.
+* Add dependencies on `pandas` and [tabulate](https://pypi.org/project/tabulate/).
+
 0.9.5 (2019-11-06)
 ==================
 

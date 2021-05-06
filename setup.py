@@ -26,7 +26,8 @@ setup(
         "stats_arrays",
         "tabulate",
     ],
-    long_description=open("README.rst").read(),
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     url="https://bitbucket.org/cmutel/brightway2-analyzer",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

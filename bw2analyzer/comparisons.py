@@ -4,6 +4,7 @@ import bw2calc as bc
 import bw2data as bd
 import math
 import numpy as np
+import operator
 import pandas as pd
 import tabulate
 
@@ -113,9 +114,11 @@ def find_differences_in_inputs(
             }
 
     if as_dataframe:
-        return DataFrame(
+        df = DataFrame(
             [{"location": obj.get("location"), **result[obj]} for obj in result]
         )
+        df.set_index("location", inplace=True)
+        return df
     else:
         return result
 
@@ -171,32 +174,37 @@ def find_leaves(
     """Traverse the supply chain of an activity to find leaves - places where the impact of that
     component falls below a threshold value.
 
-    Returns a list of ``(fraction of total impact, specific impact, amount, Activity instance)`` tuples."""
-    if results is None:
+    Returns a list of ``(impact of this activity, amount consumed, Activity instance)`` tuples."""
+    first_level = results is None
+
+    if first_level:
+        level = 0
         results = []
 
-    if lca_obj is None:
         lca_obj = bc.LCA({activity: amount}, lcia_method)
         lca_obj.lci()
         lca_obj.lcia()
         total_score = lca_obj.score
-    elif total_score is None:
-        raise ValueError
     else:
         lca_obj.redo_lcia({activity: amount})
+
+        # If this is a leaf, add the leaf and return
         if abs(lca_obj.score) <= abs(total_score * cutoff) or level >= max_level:
-            if abs(lca_obj.score) > abs(total_score * 1e-6):
-                results.append(
-                    (lca_obj.score / total_score, lca_obj.score, amount, activity)
-                )
+
+            # Only add leaves with scores that matter
+            if abs(lca_obj.score) > abs(total_score * 1e-4):
+                results.append((lca_obj.score, amount, activity))
             return results
 
-    # Add direct impacts from this activity, if relevant
-    da = np.zeros_like(lca_obj.demand_array)
-    da[lca_obj.product_dict[activity]] = amount
-    direct = (lca_obj.characterization_matrix * lca_obj.biosphere_matrix * da).sum()
-    if abs(direct) >= abs(total_score * cutoff):
-        results.append((direct / total_score, direct, amount, activity))
+        else:
+            # Add direct emissions from this CPC product
+            direct = (
+                lca_obj.characterization_matrix
+                * lca_obj.biosphere_matrix
+                * lca_obj.demand_array
+            ).sum()
+            if abs(direct) >= abs(total_score * 1e-4):
+                results.append((direct, amount, activity))
 
     for exc in activity.technosphere():
         find_leaves(
@@ -223,10 +231,10 @@ def get_cpc(activity):
         return
 
 
-def get_value_for_cpc(lst, label, index):
+def get_value_for_cpc(lst, label):
     for elem in lst:
-        if elem[3] == label:
-            return elem[index]
+        if elem[2] == label:
+            return elem[0]
     return 0
 
 
@@ -237,63 +245,121 @@ def group_leaves(leaves):
     results = {}
 
     for leaf in leaves:
-        cpc = get_cpc(leaf[3])
+        cpc = get_cpc(leaf[2])
         if cpc not in results:
-            results[cpc] = np.zeros((3,))
-        results[cpc] += np.array(leaf[:3])
+            results[cpc] = np.zeros((2,))
+        results[cpc] += np.array(leaf[:2])
 
-    _ = lambda x: float(x)
-
-    return sorted(
-        [(_(a[0]), _(a[1]), _(a[2]), k) for k, a in results.items()], reverse=True
-    )
+    return sorted([v.tolist() + [k] for k, v in results.items()], reverse=True)
 
 
-def compare_activities_by_grouped_leaves(activities, lcia_method, mode="relative"):
-    index = 0 if mode == "relative" else 1
+def compare_activities_by_grouped_leaves(
+    activities,
+    lcia_method,
+    mode="relative",
+    max_level=4,
+    cutoff=7.5e-3,
+    output_format="list",
+    str_length=50,
+):
+    """Compare activities by the impact of their different inputs, aggregated by the product classification of those inputs.
 
-    objs = [group_leaves(find_leaves(act, lcia_method)) for act in activities]
+    Args:
+        activities: list of ``Activity`` instances.
+        lcia_method: tuple. LCIA method to use when traversing supply chain graph.
+        mode: str. If "relative" (default), results are returned as a fraction of total input. Otherwise, results are absolute impact per input exchange.
+        max_level: int. Maximum level in supply chain to examine.
+        cutoff: float. Fraction of total impact to cutoff supply chain graph traversal at.
+        output_format: str. See below.
+        str_length; int. If ``output_format`` is ``html``, this controls how many characters each column label can have.
+
+    Raises:
+        ValueError: ``activities`` is malformed.
+
+    Returns:
+        Depends on ``output_format``:
+
+        * ``list``: Tuple of ``(column labels, data)``
+        * ``html``: HTML string that will print nicely in Jupyter notebooks.
+        * ``pandas``: a pandas ``DataFrame``.
+
+    """
+    for act in activities:
+        if not isinstance(act, bd.backends.peewee.proxies.Activity):
+            raise ValueError("`activities` must be an iterable of `Activity` instances")
+
+    objs = [
+        group_leaves(find_leaves(act, lcia_method, max_level=max_level, cutoff=cutoff))
+        for act in activities
+    ]
     sorted_keys = sorted(
         [
-            (max([el[index] for obj in objs for el in obj if el[3] == key]), key)
-            for key in {el[3] for obj in objs for el in obj}
+            (max([el[0] for obj in objs for el in obj if el[2] == key]), key)
+            for key in {el[2] for obj in objs for el in obj}
         ],
         reverse=True,
     )
     name_common = commonprefix([act["name"] for act in activities])
-    product_common = commonprefix([act["reference product"] for act in activities])
+
+    if " " not in name_common:
+        name_common = ""
+    else:
+        last_space = len(name_common) - operator.indexOf(reversed(name_common), " ")
+        name_common = name_common[:last_space]
+        print("Omitting activity name common prefix: '{}'".format(name_common))
+
+    product_common = commonprefix(
+        [act.get("reference product", "") for act in activities]
+    )
 
     lca = bc.LCA({act: 1 for act in activities}, lcia_method)
     lca.lci()
     lca.lcia()
 
-    labels = ["activity", "product", "location", "unit", "total"] + [
-        key for _, key in sorted_keys
-    ]
+    labels = [
+        "activity",
+        "product",
+        "location",
+        "unit",
+        "total",
+        "direct emissions",
+    ] + [key for _, key in sorted_keys]
     data = []
     for act, lst in zip(activities, objs):
         lca.redo_lcia({act: 1})
         data.append(
             [
                 act["name"].replace(name_common, ""),
-                act["reference product"].replace(product_common, ""),
-                act["location"][:25],
-                act["unit"],
+                act.get("reference product", "").replace(product_common, ""),
+                act.get("location", "")[:25],
+                act.get("unit", ""),
                 lca.score,
             ]
-            + [get_value_for_cpc(lst, key, index) for _, key in sorted_keys]
+            + [
+                (
+                    lca.characterization_matrix
+                    * lca.biosphere_matrix
+                    * lca.demand_array
+                ).sum()
+            ]
+            + [get_value_for_cpc(lst, key) for _, key in sorted_keys]
         )
 
-    return labels, data
+    data.sort(key=lambda x: x[4], reverse=True)
 
+    if mode == "relative":
+        for row in data:
+            for index, point in enumerate(row[5:]):
+                row[index + 5] = point / row[4]
 
-def table_for_grouped_leaves_compared_activities(
-    activities, lcia_method, mode="relative", str_cutoff=50
-):
-    labels, data = compare_activities_by_grouped_leaves(activities, lcia_method, mode)
-    return tabulate.tabulate(
-        sorted(data, key=lambda x: x[4]),
-        [x[:str_cutoff] for x in labels],
-        tablefmt="html",
-        floatfmt=".3f",
-    )
+    if output_format == "list":
+        return labels, data
+    elif output_format == "pandas":
+        return pd.DataFrame(data, columns=labels)
+    elif output_format == "html":
+        return tabulate.tabulate(
+            data,
+            [x[:str_length] for x in labels],
+            tablefmt="html",
+            floatfmt=".3f",
+        )

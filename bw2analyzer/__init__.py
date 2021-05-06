@@ -10,7 +10,6 @@ __all__ = [
     "print_recursive_calculation",
     "print_recursive_supply_chain",
     "SerializedLCAReport",
-    "table_for_grouped_leaves_compared_activities",
     "traverse_tagged_databases",
 ]
 
@@ -22,5 +21,5 @@ from .page_rank import PageRank
 from .report import SerializedLCAReport
 from .sc_graph import GTManipulator
 from .tagged import traverse_tagged_databases
-from .comparisons import find_differences_in_inputs, compare_activities_by_lcia_score, table_for_grouped_leaves_compared_activities, compare_activities_by_grouped_leaves
+from .comparisons import find_differences_in_inputs, compare_activities_by_lcia_score, compare_activities_by_grouped_leaves
 from .utils import print_recursive_calculation, print_recursive_supply_chain

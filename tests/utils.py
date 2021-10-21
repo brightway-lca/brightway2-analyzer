@@ -8,7 +8,7 @@ import io
 
 @bw2test
 def test_print_recursive_calculation(capsys):
-    bd.Database("c").write({("c", "flow"): {'type': 'emission'}})
+    bd.Database("c").write({("c", "flow"): {"type": "emission"}})
     db = bd.Database("a")
 
     db.write(recursive_fixture)

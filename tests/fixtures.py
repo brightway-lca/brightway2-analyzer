@@ -22,8 +22,7 @@ recursive_fixture = {
         "exchanges": [
             {"input": ("a", "flow"), "type": "biosphere", "amount": 2},
             {"input": ("a", "2"), "type": "technosphere", "amount": 0.8},
-
-            ],
+        ],
     },
     ("a", "2"): {
         "name": "process 2",

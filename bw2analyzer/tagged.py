@@ -1,6 +1,7 @@
-from bw2data import get_activity, Method
-from bw2calc import LCA
 from collections import defaultdict
+
+from bw2calc import LCA
+from bw2data import Method, get_activity
 
 
 def traverse_tagged_databases(
@@ -192,7 +193,7 @@ def recurse_tagged_database(
     else:
         raise ValueError("Can't scale by production exchange")
 
-    inside = [exc for exc in inputs if exc.input['database'] == activity["database"]]
+    inside = [exc for exc in inputs if exc.input["database"] == activity["database"]]
 
     outside = {
         exc.input.id: exc["amount"] / scale * amount
@@ -362,7 +363,7 @@ def multi_recurse_tagged_database(
         activity = get_activity(activity)
 
     inputs = list(activity.technosphere())
-    inside = [exc for exc in inputs if exc.input['database'] == activity["database"]]
+    inside = [exc for exc in inputs if exc.input["database"] == activity["database"]]
     outside = {
         exc.input.id: exc["amount"] * amount
         for exc in inputs

@@ -1,6 +1,6 @@
-from bw2data import Database
 from bw2calc import LCA
-from numpy import array, ones, absolute, dot, where
+from bw2data import Database
+from numpy import absolute, array, dot, ones, where
 
 
 class ConvergenceError(Exception):
@@ -15,7 +15,10 @@ class PageRank:
         self.lca = LCA({self.database.random(): 1})
         self.lca.lci()
         self.matrix = self.lca.technosphere_matrix.transpose()
-        self.pr = [(x[0], self.lca.dicts.activity.reversed[x[1]]) for x in self.page_rank(self.matrix)]
+        self.pr = [
+            (x[0], self.lca.dicts.activity.reversed[x[1]])
+            for x in self.page_rank(self.matrix)
+        ]
         return self.pr
 
     def page_rank(self, technosphere, alpha=0.85, max_iter=100, tol=1e-6):

@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 
 

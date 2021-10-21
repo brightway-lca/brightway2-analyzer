@@ -1,13 +1,15 @@
-from .contribution import ContributionAnalysis
-from .econ import herfindahl_index, concentration_ratio
-from .sc_graph import GTManipulator
-from bw2data import JsonWrapper, methods, config, projects, get_activity
-from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
-from scipy.stats import gaussian_kde
-import numpy as np
 import os
-import requests
 import uuid
+
+import numpy as np
+import requests
+from bw2calc import LCA, GraphTraversal, ParallelMonteCarlo
+from bw2data import JsonWrapper, config, get_activity, methods, projects
+from scipy.stats import gaussian_kde
+
+from .contribution import ContributionAnalysis
+from .econ import concentration_ratio, herfindahl_index
+from .sc_graph import GTManipulator
 
 
 class SerializedLCAReport:

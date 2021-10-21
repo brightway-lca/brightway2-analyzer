@@ -1,5 +1,5 @@
-from bw2data import get_activity
 import numpy as np
+from bw2data import get_activity
 
 
 class ContributionAnalysis:
@@ -131,7 +131,11 @@ class ContributionAnalysis:
 
         """
         results = [
-            (score, lca.supply_array[int(index)], lca.dicts.activity.reversed[int(index)])
+            (
+                score,
+                lca.supply_array[int(index)],
+                lca.dicts.activity.reversed[int(index)],
+            )
             for score, index in self.top_processes(
                 lca.characterized_inventory, **kwargs
             )

@@ -347,11 +347,11 @@ class SimplifyTestCase(unittest.TestCase):
     def test_linear(self):
         """Test supply chain graph like this:
 
-            o
-            |    o
-            x => |
-            |    o
-            o
+        o
+        |    o
+        x => |
+        |    o
+        o
 
         """
         nodes = {
@@ -375,11 +375,11 @@ class SimplifyTestCase(unittest.TestCase):
     def test_y(self):
         r"""Test supply chain graph like this:
 
-            o   o     o   o
-             \ /       \ /
-              x   =>    o
-              |
-              o
+        o   o     o   o
+         \ /       \ /
+          x   =>    o
+          |
+          o
 
         """
         nodes = {
@@ -441,11 +441,11 @@ class SimplifyTestCase(unittest.TestCase):
     def test_diamond(self):
         r"""Test supply chain graph like this:
 
-              o
-             / \      o
-            x   x =>  |
-             \ /      o
-              o
+          o
+         / \      o
+        x   x =>  |
+         \ /      o
+          o
 
         """
         nodes = {
@@ -471,11 +471,11 @@ class SimplifyTestCase(unittest.TestCase):
     def test_x(self):
         r"""Test supply chain graph like this:
 
-            o   o
-             \ /      o  o
-              x   =>  |\/|
-             / \      |/\|
-            o   o     o  o
+        o   o
+         \ /      o  o
+          x   =>  |\/|
+         / \      |/\|
+        o   o     o  o
         """
         nodes = {
             1: {"amount": 1, "ind": 1},

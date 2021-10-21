@@ -14,7 +14,7 @@ import pytest
 @pytest.fixture
 @bw2test
 def cabls(capsys):
-    bd.Database("a").write({("a", "flow"): {'type': 'emission'}})
+    bd.Database("a").write({("a", "flow"): {"type": "emission"}})
 
     data = {
         ("c", "flow"): {"name": "flow", "type": "biosphere"},
@@ -40,7 +40,7 @@ def cabls(capsys):
 
 @bw2test
 def test_compare_activities_by_lcia_score_similar(capsys):
-    bd.Database("a").write({("a", "flow"): {'type': 'emission'}})
+    bd.Database("a").write({("a", "flow"): {"type": "emission"}})
 
     data = {
         ("c", "flow"): {"name": "flow", "type": "biosphere"},
@@ -186,7 +186,7 @@ def test_find_differences_in_inputs_errors(fdii):
 @pytest.fixture
 @bw2test
 def cabgl():
-    bd.Database("a").write({("a", "flow"): {'type': 'emission'}})
+    bd.Database("a").write({("a", "flow"): {"type": "emission"}})
 
     data = {
         ("c", "flow"): {"name": "flow", "type": "biosphere"},

@@ -21,9 +21,7 @@ def tagged_fixture():
 
     method = Method(("test method",))
     method.register()
-    method.write(
-        [(("biosphere", "bad"), 2), (("biosphere", "worse"), 3)]
-    )
+    method.write([(("biosphere", "bad"), 2), (("biosphere", "worse"), 3)])
 
     Database("background").write(
         {
@@ -249,7 +247,10 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
     method = Method(("test method",))
     method.register()
     method.write(
-        [(("biosphere", "bad"), 2), (("biosphere", "worse"), 3),]
+        [
+            (("biosphere", "bad"), 2),
+            (("biosphere", "worse"), 3),
+        ]
     )
     Database("background").write(
         {
@@ -286,7 +287,11 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
                         "amount": 4,
                         "type": "technosphere",
                     },
-                    {"input": ("foreground", "fu"), "amount": 2, "type": "production",},
+                    {
+                        "input": ("foreground", "fu"),
+                        "amount": 2,
+                        "type": "production",
+                    },
                 ],
             },
             ("foreground", "i"): {
@@ -318,14 +323,22 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
             ("foreground", "ii"): {
                 "tag field": "C",
                 "exchanges": [
-                    {"input": ("biosphere", "bad"), "amount": 8, "type": "biosphere",},
+                    {
+                        "input": ("biosphere", "bad"),
+                        "amount": 8,
+                        "type": "biosphere",
+                    },
                     {
                         "input": ("biosphere", "worse"),
                         "amount": 7,
                         "tag field": "D",
                         "type": "biosphere",
                     },
-                    {"input": ("foreground", "ii"), "amount": 3, "type": "production",},
+                    {
+                        "input": ("foreground", "ii"),
+                        "amount": 3,
+                        "type": "production",
+                    },
                 ],
             },
             ("foreground", "iii"): {

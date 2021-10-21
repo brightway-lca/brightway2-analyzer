@@ -11,13 +11,24 @@ import unittest
 class ContributionTestCase(unittest.TestCase):
     def test_sort_array_number(self):
         test_data = np.array((1.0, 2.0, 4.0, 3.0))
-        answer = np.array(((4, 2), (3, 3), (2, 1),))
+        answer = np.array(
+            (
+                (4, 2),
+                (3, 3),
+                (2, 1),
+            )
+        )
         ca = CA()
         self.assertTrue(np.allclose(answer, ca.sort_array(test_data, limit=3)))
 
     def test_sort_array_percentage(self):
         test_data = np.array((1.0, 2.0, 4.0, 3.0))
-        answer = np.array(((4, 2), (3, 3),))
+        answer = np.array(
+            (
+                (4, 2),
+                (3, 3),
+            )
+        )
         ca = CA()
         self.assertTrue(
             np.allclose(
@@ -59,7 +70,7 @@ class ContributionTestCase(unittest.TestCase):
 
 class Contribution2TestCase(BW2DataTest):
     def install_fixtures(self):
-        Database("c").write({("c", "flow"): {'type': 'emission'}})
+        Database("c").write({("c", "flow"): {"type": "emission"}})
 
         db = Database("a")
         db.write(lci_fixture)
@@ -82,4 +93,8 @@ class Contribution2TestCase(BW2DataTest):
         lca = LCA({("a", "2"): 1}, ("method",))
         lca.lci()
         lca.lcia()
-        CA().d3_treemap(lca.characterized_inventory, lca.dicts.biosphere.reversed, lca.dicts.activity.reversed)
+        CA().d3_treemap(
+            lca.characterized_inventory,
+            lca.dicts.biosphere.reversed,
+            lca.dicts.activity.reversed,
+        )

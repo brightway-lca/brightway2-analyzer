@@ -1,12 +1,13 @@
+import math
+import operator
 from os.path import commonprefix
-from pandas import DataFrame
+
 import bw2calc as bc
 import bw2data as bd
-import math
 import numpy as np
-import operator
 import pandas as pd
 import tabulate
+from pandas import DataFrame
 
 
 def aggregated_dict(activity):

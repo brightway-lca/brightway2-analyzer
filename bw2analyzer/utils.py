@@ -1,8 +1,9 @@
-from bw2data import Database, methods, databases, mapping, Method, config
 from time import time
+
 import bw2calc as bc
 import numpy as np
 import pyprind
+from bw2data import Database, Method, config, databases, mapping, methods
 
 
 def contribution_for_all_datasets_one_method(database, method, progress=True):

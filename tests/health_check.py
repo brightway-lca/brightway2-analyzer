@@ -11,7 +11,7 @@ class DHCMock(DatabaseHealthCheck):
 
 class HealthCheckTestCase(BW2DataTest):
     def test_health_check(self):
-        Database("c").write({("c", "flow"): {'type': 'emission'}})
+        Database("c").write({("c", "flow"): {"type": "emission"}})
 
         db = Database("a")
         db.write(lci_fixture)

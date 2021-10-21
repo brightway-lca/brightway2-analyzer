@@ -1,7 +1,8 @@
-from bw2data import Database, config, get_activity
-from heapq import heappush, heappop
 import copy
 import itertools
+from heapq import heappop, heappush
+
+from bw2data import Database, config, get_activity
 
 
 def tupify(o):

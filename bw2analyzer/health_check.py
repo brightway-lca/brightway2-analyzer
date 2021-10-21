@@ -1,10 +1,18 @@
-from .matrix_grapher import SparseMatrixGrapher
-from .page_rank import PageRank
+import os
+
+import numpy as np
 from bw2calc import LCA
 from bw2data import Database, projects
-from stats_arrays import (uncertainty_choices, LognormalUncertainty, NormalUncertainty, TriangularUncertainty, UniformUncertainty)
-import numpy as np
-import os
+from stats_arrays import (
+    LognormalUncertainty,
+    NormalUncertainty,
+    TriangularUncertainty,
+    UniformUncertainty,
+    uncertainty_choices,
+)
+
+from .matrix_grapher import SparseMatrixGrapher
+from .page_rank import PageRank
 
 
 class DatabaseHealthCheck:
@@ -136,13 +144,16 @@ class DatabaseHealthCheck:
 
     def no_self_production(self):
         def self_production(ds):
-            return any(exc.input == exc.output for exc in ds.get('exchanges', []) if exc['type'] in ('production', 'generic production'))
+            return any(
+                exc.input == exc.output
+                for exc in ds.get("exchanges", [])
+                if exc["type"] in ("production", "generic production")
+            )
 
         return {
             ds.key
             for ds in self.db
-            if ds.get("type", "process") == "process"
-            and not self_production(ds)
+            if ds.get("type", "process") == "process" and not self_production(ds)
         }
 
     # def ouroboros(self):

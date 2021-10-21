@@ -2,12 +2,12 @@ from .matrix_grapher import SparseMatrixGrapher
 from .page_rank import PageRank
 from bw2calc import LCA
 from bw2data import Database, projects
-from stats_arrays import *
+from stats_arrays import (uncertainty_choices, LognormalUncertainty, NormalUncertainty, TriangularUncertainty, UniformUncertainty)
 import numpy as np
 import os
 
 
-class DatabaseHealthCheck(object):
+class DatabaseHealthCheck:
     def __init__(self, database):
         self.db = Database(database)
         self.db.filters = {"type": "process"}
@@ -27,7 +27,7 @@ class DatabaseHealthCheck(object):
             "me": aggregated["many_exchanges"],
             "nsp": self.no_self_production(),
             "mo": self.multioutput_processes(),
-            "ob": self.ouroboros(),
+            "ob": {},
         }
 
     def make_graphs(self, graphs_dir=None):
@@ -135,34 +135,29 @@ class DatabaseHealthCheck(object):
         return {"system_processes": system_processes, "many_exchanges": many_exchanges}
 
     def no_self_production(self):
-        self_production = lambda a, b: not a or b in a
+        def self_production(ds):
+            return any(exc.input == exc.output for exc in ds.get('exchanges', []) if exc['type'] in ('production', 'generic production'))
+
         return {
-            key
-            for key, value in self.db.load().items()
-            if value.get("type", "process") == "process"
-            and not self_production(
-                {
-                    exc["input"]
-                    for exc in value.get("exchanges", [])
-                    if exc["type"] == "production"
-                },
-                key,
-            )
+            ds.key
+            for ds in self.db
+            if ds.get("type", "process") == "process"
+            and not self_production(ds)
         }
 
-    def ouroboros(self):
-        """Find processes that consume their own reference products as inputs. Not necessarily an error, but should be examined carefully (see `Two potential points of confusion in LCA math <http://chris.mutel.org/too-confusing.html>`__).
+    # def ouroboros(self):
+    #     """Find processes that consume their own reference products as inputs. Not necessarily an error, but should be examined carefully (see `Two potential points of confusion in LCA math <http://chris.mutel.org/too-confusing.html>`__).
 
-        Returns:
-            A set of database keys.
+    #     Returns:
+    #         A set of database keys.
 
-        """
-        return {
-            key
-            for key, value in self.db.load().items()
-            if any(
-                exc
-                for exc in value.get("exchanges", [])
-                if exc["input"] == key and exc["type"] == "technosphere"
-            )
-        }
+    #     """
+    #     return {
+    #         key
+    #         for key, value in self.db.load().items()
+    #         if any(
+    #             exc
+    #             for exc in value.get("exchanges", [])
+    #             if exc["input"] == key and exc["type"] == "technosphere"
+    #         )
+    #     }

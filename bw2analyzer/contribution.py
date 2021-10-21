@@ -1,8 +1,8 @@
-from bw2data import Database, get_activity
+from bw2data import get_activity
 import numpy as np
 
 
-class ContributionAnalysis(object):
+class ContributionAnalysis:
     def sort_array(self, data, limit=25, limit_type="number", total=None):
         """
         Common sorting function for all ``top`` methods. Sorts by highest value first.
@@ -103,9 +103,8 @@ class ContributionAnalysis(object):
     def hinton_matrix(self, lca, rows=5, cols=5):
         coo, b, t = self.top_matrix(lca.characterized_inventory, rows=rows, cols=cols)
         coo = [row[2:] for row in coo]  # Don't need matrix indices
-        ra, rp, rb = lca.reverse_dict()
-        flows = [self.get_name(rb[x]) for x in b]
-        activities = [self.get_name(ra[x]) for x in t]
+        flows = [self.get_name(lca.dicts.biosphere.reversed[x]) for x in b]
+        activities = [self.get_name(lca.dicts.activity.reversed[x]) for x in t]
         return {
             "results": coo,
             "total": lca.score,
@@ -131,9 +130,8 @@ class ContributionAnalysis(object):
         Returns a list of tuples: ``(lca score, supply, activity)``. If ``names`` is False, they returns the process key as the last element.
 
         """
-        ra, rp, rb = lca.reverse_dict()
         results = [
-            (score, lca.supply_array[int(index)], ra[int(index)])
+            (score, lca.supply_array[int(index)], lca.dicts.activity.reversed[int(index)])
             for score, index in self.top_processes(
                 lca.characterized_inventory, **kwargs
             )
@@ -148,9 +146,8 @@ class ContributionAnalysis(object):
         Returns a list of tuples: ``(lca score, inventory amount, activity)``. If ``names`` is False, they returns the process key as the last element.
 
         """
-        ra, rp, rb = lca.reverse_dict()
         results = [
-            (score, lca.inventory[index, :].sum(), rb[index])
+            (score, lca.inventory[index, :].sum(), lca.dicts.biosphere.reversed[index])
             for score, index in self.top_emissions(
                 lca.characterized_inventory, **kwargs
             )
@@ -185,7 +182,7 @@ class ContributionAnalysis(object):
         total = np.abs(matrix).sum()
         processes = self.top_processes(matrix, limit=limit, limit_type=limit_type)
         data = {"name": "LCA result", "children": [], "size": total}
-        for dummy, tech_index in processes:
+        for _, tech_index in processes:
             name = self.get_name(rev_techno[tech_index])
             this_score = np.abs(matrix[:, int(tech_index)].toarray().ravel()).sum()
             children = []
@@ -212,28 +209,3 @@ class ContributionAnalysis(object):
                 }
             )
         return data
-
-    # def top_emissions_for_process(self, process, **kwargs):
-    #     if hasattr(process, "id"):
-    #         process = process.id
-    #     if not hasattr(self.dicts, 'reverse'):
-    #         self.construct_reverse_dicts()
-    #     return self._top(array(self.weighted_biosphere[:,process].todense(
-    #         )).ravel(), self.dicts.reverse.biosphere, **kwargs)
-
-    # def top_processes_for_emission(self, biosphere_flow, **kwargs):
-    #     if hasattr(biosphere_flow, "id"):
-    #         biosphere_flow = biosphere_flow.id
-    #     if not hasattr(self.dicts, 'reverse'):
-    #         self.construct_reverse_dicts()
-    #     return self._top(array(self.weighted_biosphere[biosphere_flow,:
-    #         ].todense()).ravel(), self.dicts.reverse.technosphere, **kwargs)
-
-    # def top_processes_for_emission_inventory(self, emission, **kwargs):
-    #     """Get the most important inventory processes for an emission"""
-    #     if hasattr(emission, "id"):
-    #         emission = emission.id
-    #     if not hasattr(self.dicts, 'reverse'):
-    #         self.construct_reverse_dicts()
-    #     return self._top(array(self.calculated_biosphere[emission,:].todense(
-    #         )).ravel(), self.dicts.reverse.technosphere, **kwargs)

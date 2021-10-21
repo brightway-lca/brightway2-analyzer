@@ -10,7 +10,7 @@ import requests
 import uuid
 
 
-class SerializedLCAReport(object):
+class SerializedLCAReport:
     """A complete LCA report (i.e. LCA score, Monte Carlo uncertainty analysis, contribution analysis) that can be serialized to a defined standard."""
 
     version = 2

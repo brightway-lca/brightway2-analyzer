@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
-from eight import *
-
 lci_fixture = {
     ("a", "flow"): {"name": "flow", "type": "biosphere"},
     ("a", "1"): {

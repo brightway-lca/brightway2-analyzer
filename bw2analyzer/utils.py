@@ -33,19 +33,17 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         else:
             return scores / summed
 
-    start = time()
-    assert database in databases, "Can't find database %s" % database
-    assert method in methods, "Can't find method %s" % method
-    keys = Database(database).load().keys()
-    assert keys, "Database %s appears to have no datasets" % database
+    assert database in databases, f"Can't find database {database}"
+    assert method in methods, f"Can't find method {method}"
+    db = Database(database)
+    assert len(db), f"Database {database} appears to have no datasets"
 
     # Array to store results
-    results = np.zeros((len(keys), len(keys)), dtype=np.float32)
+    results = np.zeros((len(db), len(db)), dtype=np.float32)
 
     # Instantiate LCA object
-    lca = bc.LCA({keys[0]: 1}, method=method)
+    lca = bc.LCA({db.random(): 1}, method=method)
     lca.lci()
-    lca.decompose_technosphere()
     lca.lcia()
 
     rows = lca.characterized_inventory.shape[0]
@@ -58,15 +56,15 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         "all": np.zeros((all_cutoff, cols), dtype=np.float32),
     }
 
-    pbar = pyprind.ProgBar(len(keys), title="Activities:")
+    pbar = pyprind.ProgBar(len(db), title="Activities:")
 
     # Actual calculations
-    for key in keys:
-        lca.redo_lcia({key: 1})
-        if lca.score == 0.0:
+    for ds in db:
+        lca.redo_lcia({ds.id: 1})
+        if not lca.score:
             continue
 
-        col = lca.activity_dict[mapping[key]]
+        col = lca.dicts.activity[ds.id]
         results["activities"][:, col] = get_normalized_scores(lca, "activities")
         results["flows"][:, col] = get_normalized_scores(lca, "flows")
         results_all = get_normalized_scores(lca, "all")
@@ -80,50 +78,7 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
 
     print(pbar)
 
-    return results, lca.activity_dict, time() - start
-
-
-def group_by_emissions(method):
-    """Group characterization factors by name, realm, and unit.
-
-    **realm** is the general category, e.g. air, soil, water.
-
-    Does not work on regionalized LCIA methods!
-
-    Args:
-        *method* (tuple or Method): LCIA method
-
-    Returns:
-        Dictionary: {(name, realm, unit)}: [cfs... ]
-
-    """
-    if isinstance(method, Method):
-        data = method.load()
-    elif isinstance(method, tuple):
-        data = Method(method).load()
-    else:
-        raise ValueError("Can't interpret %s as a LCIA method" % method)
-
-    biosphere = Database(config.biosphere).load()
-    grouped = {}
-
-    for key, cf, geo in data:
-        if geo != config.global_location:
-            raise ValueError(
-                "`group_by_emissions` doesn't work on regionalized methods"
-            )
-        if key[0] != config.biosphere:
-            # Alternative biosphere, e.g. Ecoinvent 3. Add new biosphere DB
-            biosphere.update(Database(key[0]).load())
-        flow = biosphere[key]
-        label = (
-            flow.get("name", "Unknown"),
-            flow.get("categories", [""])[0],
-            flow.get("unit", "Unknown"),
-        )
-        grouped.setdefault(label, []).append(cf)
-
-    return grouped
+    return results
 
 
 def print_recursive_calculation(
@@ -171,7 +126,7 @@ def print_recursive_calculation(
     elif total_score is None:
         raise ValueError
     else:
-        lca_obj.redo_lcia({activity: amount})
+        lca_obj.redo_lcia({activity.id: amount})
         if abs(lca_obj.score) <= abs(total_score * cutoff):
             return
     if first:

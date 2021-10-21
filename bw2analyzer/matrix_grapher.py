@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 
 
-class SparseMatrixGrapher(object):
+class SparseMatrixGrapher:
     def __init__(self, matrix):
         self.matrix = matrix
 

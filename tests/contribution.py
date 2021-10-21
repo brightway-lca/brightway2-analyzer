@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from eight import *
-
 from .fixtures import lci_fixture, method_fixture
 from bw2analyzer.contribution import ContributionAnalysis as CA
 from bw2calc import LCA
@@ -63,11 +59,15 @@ class ContributionTestCase(unittest.TestCase):
 
 class Contribution2TestCase(BW2DataTest):
     def install_fixtures(self):
+        Database("c").write({("c", "flow"): {'type': 'emission'}})
+
         db = Database("a")
         db.write(lci_fixture)
+
         method = Method(("method",))
         method.register()
         method.write(method_fixture)
+
         return db, method
 
     def test_hinton_matrix_no_error(self):
@@ -82,5 +82,4 @@ class Contribution2TestCase(BW2DataTest):
         lca = LCA({("a", "2"): 1}, ("method",))
         lca.lci()
         lca.lcia()
-        ra, rp, rb = lca.reverse_dict()
-        CA().d3_treemap(lca.characterized_inventory, rb, ra)
+        CA().d3_treemap(lca.characterized_inventory, lca.dicts.biosphere.reversed, lca.dicts.activity.reversed)

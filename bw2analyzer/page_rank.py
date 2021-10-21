@@ -7,16 +7,15 @@ class ConvergenceError(Exception):
     pass
 
 
-class PageRank(object):
+class PageRank:
     def __init__(self, database):
         self.database = database
 
     def calculate(self):
         self.lca = LCA({self.database.random(): 1})
         self.lca.lci()
-        self.ra, _, _ = self.lca.reverse_dict()
         self.matrix = self.lca.technosphere_matrix.transpose()
-        self.pr = [(x[0], self.ra[x[1]]) for x in self.page_rank(self.matrix)]
+        self.pr = [(x[0], self.lca.dicts.activity.reversed[x[1]]) for x in self.page_rank(self.matrix)]
         return self.pr
 
     def page_rank(self, technosphere, alpha=0.85, max_iter=100, tol=1e-6):

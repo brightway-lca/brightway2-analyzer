@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
-from eight import *
-
 from bw2analyzer.sc_graph import GTManipulator
 from bw2data import (
     Database,
@@ -14,6 +10,7 @@ from bw2data import (
 from bw2data.tests import BW2DataTest
 import unittest
 import copy
+from bw2calc.dictionary_manager import DictionaryManager
 
 
 class UnrollGraphTestCase(unittest.TestCase):
@@ -229,13 +226,11 @@ class UnrollGraphTestCase(unittest.TestCase):
 
 
 class MetadataTestCase(BW2DataTest):
-    class LCAMock(object):
-        def reverse_dict(self):
-            return (
-                {1: ("A", "a"), 2: ("A", "b"), 3: ("A", "c")},
-                {1: ("A", "a"), 2: ("A", "b"), 3: ("A", "c")},
-                {},
-            )
+    class LCAMock:
+        def __init__(self):
+            self.dicts = DictionaryManager()
+            self.dicts.activity = {("A", "a"): 1, ("A", "b"): 2, ("A", "c"): 3}
+            self.dicts.product = {("A", "a"): 1, ("A", "b"): 2, ("A", "c"): 3}
 
     def extra_setup(self):
         data = {

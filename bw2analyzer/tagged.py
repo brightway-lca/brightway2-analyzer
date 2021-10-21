@@ -101,9 +101,7 @@ def traverse_tagged_databases(
     """
 
     lca = LCA(functional_unit, method)
-
-    lca.lci(factorize=True)
-
+    lca.lci()
     lca.lcia()
 
     method_dict = {o[0]: o[1] for o in Method(method).load()}
@@ -152,66 +150,40 @@ def recurse_tagged_database(
 
     Input arguments:
 
-
         * ``activity``: Activity tuple or object
-
         * ``amount``: float
-
         * ``method_dict``: Dictionary of biosphere flow tuples to CFs, e.g. ``{("biosphere", "foo"): 3}``
-
         * ``lca``: An ``LCA`` object that is already initialized, i.e. has already calculated LCI and LCIA with same method as in ``method_dict``
-
         * ``label``: string
-
         * ``default_tag``: string
-
         * ``secondary_tags``: List of tuples in the format (secondary_label, secondary_default_tag). Default is empty list.
-
 
     Returns:
 
-
     .. code-block:: python
 
-
         {
-
             'activity': activity object,
-
             'amount': float,
-
             'tag': string,
-
             'secondary_tags': [list of strings],
-
             'impact': float (impact of inputs from outside foreground database),
-
             'biosphere': [{
-
                 'amount': float,
-
                 'impact': float,
-
                 'tag': string,
-
                 'secondary_tags': [list of strings]
-
             }],
-
             'technosphere': [this data structure]
-
         }
 
-
     """
-
     if isinstance(activity, tuple):
-
         activity = get_activity(activity)
 
     inputs = list(activity.technosphere())
-
     production = list(activity.production())
+
     if len(production) == 1:
         scale = production[0]["amount"]
     elif not production:
@@ -220,22 +192,18 @@ def recurse_tagged_database(
     else:
         raise ValueError("Can't scale by production exchange")
 
-    inside = [exc for exc in inputs if exc["input"][0] == activity["database"]]
+    inside = [exc for exc in inputs if exc.input['database'] == activity["database"]]
 
     outside = {
-        exc["input"]: exc["amount"] / scale * amount
+        exc.input.id: exc["amount"] / scale * amount
         for exc in inputs
         if exc["input"][0] != activity["database"]
     }
 
     if outside:
-
         lca.redo_lcia(outside)
-
         outside_score = lca.score
-
     else:
-
         outside_score = 0
 
     return {
@@ -394,9 +362,9 @@ def multi_recurse_tagged_database(
         activity = get_activity(activity)
 
     inputs = list(activity.technosphere())
-    inside = [exc for exc in inputs if exc["input"][0] == activity["database"]]
+    inside = [exc for exc in inputs if exc.input['database'] == activity["database"]]
     outside = {
-        exc["input"]: exc["amount"] * amount
+        exc.input.id: exc["amount"] * amount
         for exc in inputs
         if exc["input"][0] != activity["database"]
     }

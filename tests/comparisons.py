@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from eight import *
-
 from .fixtures import method_fixture
 from bw2analyzer import (
     compare_activities_by_grouped_leaves,
@@ -9,7 +5,6 @@ from bw2analyzer import (
     compare_activities_by_lcia_score,
 )
 from bw2data.tests import bw2test
-import bw2calc as bc
 import bw2data as bd
 import numpy as np
 import pandas as pd
@@ -19,9 +14,8 @@ import pytest
 @pytest.fixture
 @bw2test
 def cabls(capsys):
-    method = bd.Method(("method",))
-    method.register()
-    method.write(method_fixture)
+    bd.Database("a").write({("a", "flow"): {'type': 'emission'}})
+
     data = {
         ("c", "flow"): {"name": "flow", "type": "biosphere"},
         ("c", "1"): {
@@ -37,14 +31,17 @@ def cabls(capsys):
     }
     db = bd.Database("c")
     db.write(data)
+
+    method = bd.Method(("method",))
+    method.register()
+    method.write(method_fixture)
     capsys.readouterr()
 
 
 @bw2test
 def test_compare_activities_by_lcia_score_similar(capsys):
-    method = bd.Method(("method",))
-    method.register()
-    method.write(method_fixture)
+    bd.Database("a").write({("a", "flow"): {'type': 'emission'}})
+
     data = {
         ("c", "flow"): {"name": "flow", "type": "biosphere"},
         ("c", "1"): {
@@ -60,6 +57,10 @@ def test_compare_activities_by_lcia_score_similar(capsys):
     }
     db = bd.Database("c")
     db.write(data)
+
+    method = bd.Method(("method",))
+    method.register()
+    method.write(method_fixture)
 
     capsys.readouterr()
     compare_activities_by_lcia_score([("c", "1"), ("c", "2")], ("method",))
@@ -185,6 +186,8 @@ def test_find_differences_in_inputs_errors(fdii):
 @pytest.fixture
 @bw2test
 def cabgl():
+    bd.Database("a").write({("a", "flow"): {'type': 'emission'}})
+
     data = {
         ("c", "flow"): {"name": "flow", "type": "biosphere"},
         ("c", "1"): {

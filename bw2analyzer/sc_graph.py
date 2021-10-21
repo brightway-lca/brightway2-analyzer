@@ -1,4 +1,4 @@
-from bw2data import Database, config
+from bw2data import Database, config, get_activity
 from heapq import heappush, heappop
 import copy
 import itertools
@@ -9,7 +9,7 @@ def tupify(o):
     return (-1 * o["impact"], o["from"], o["to"], o["amount"], o["exc_amount"])
 
 
-class GTManipulator(object):
+class GTManipulator:
     """Manipulate ``GraphTraversal`` results."""
 
     @staticmethod
@@ -83,7 +83,6 @@ class GTManipulator(object):
     @staticmethod
     def add_metadata(nodes, lca):
         """Add metadata to nodes, like name, unit, and category."""
-        ra, rp, rb = lca.reverse_dict()
         new_nodes = {}
         for key, value in nodes.items():
             new_value = copy.deepcopy(value)
@@ -100,8 +99,8 @@ class GTManipulator(object):
                     index = value["row"]
                 else:
                     index = key
-                code = ra[index]
-                ds = Database(code[0]).get([code[1]]).as_dict()
+                code = lca.dicts.activity.reversed[index]
+                ds = get_activity(code)
                 new_value.update(
                     {
                         "name": ds.get("name", "Unknown"),
@@ -218,7 +217,7 @@ class GTManipulator(object):
             if "row" in node_data:
                 node_key = node_data["row"]
             key = ra[node_key]
-            ds = Database(key[0]).get([key[1]]).as_dict()
+            ds = get_activity(key)
             return {
                 "name": ds.get("name", "Unknown"),
                 "unit": ds.get("unit", "Unknown"),

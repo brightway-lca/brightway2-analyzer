@@ -77,12 +77,7 @@ def find_differences_in_inputs(
 
 
     """
-    try:
-        math.isclose(1, 1)
-    except AttributeError:
-        raise ImportError("This function requires Python >= 3.5")
-
-    assert isinstance(activity, bd.backends.peewee.proxies.Activity)
+    assert isinstance(activity, bd.backends.proxies.Activity)
 
     try:
         similar = [
@@ -94,7 +89,7 @@ def find_differences_in_inputs(
             and (not locations or obj.get("location") in locations)
         ]
     except KeyError:
-        raise ValueError("Given activity has no `name`")
+        raise ValueError("Given activity has no `name`; can't find similar names")
 
     result = {}
 
@@ -140,6 +135,8 @@ def compare_activities_by_lcia_score(activities, lcia_method, band=0.1):
     """
     import bw2calc as bc
 
+    activities = [bd.get_activity(obj) for obj in activities]
+
     lca = bc.LCA({a: 1 for a in activities}, lcia_method)
     lca.lci()
     lca.lcia()
@@ -148,7 +145,7 @@ def compare_activities_by_lcia_score(activities, lcia_method, band=0.1):
     scores = []
 
     for a in activities:
-        lca.redo_lcia({a: 1})
+        lca.redo_lcia({a.id: 1})
         scores.append(lca.score)
 
     if abs(max(scores) - min(scores)) < band * abs(max(scores)):
@@ -157,7 +154,7 @@ def compare_activities_by_lcia_score(activities, lcia_method, band=0.1):
     else:
         print("Differences observed. LCA scores:")
         for x, y in zip(scores, activities):
-            print("\t{:5.3f} -> {}".format(x, y))
+            print("\t{:5.3f} -> {}".format(x, y.key))
 
 
 def find_leaves(
@@ -177,6 +174,8 @@ def find_leaves(
     Returns a list of ``(impact of this activity, amount consumed, Activity instance)`` tuples."""
     first_level = results is None
 
+    activity = bd.get_activity(activity)
+
     if first_level:
         level = 0
         results = []
@@ -186,7 +185,7 @@ def find_leaves(
         lca_obj.lcia()
         total_score = lca_obj.score
     else:
-        lca_obj.redo_lcia({activity: amount})
+        lca_obj.redo_lcia({activity.id: amount})
 
         # If this is a leaf, add the leaf and return
         if abs(lca_obj.score) <= abs(total_score * cutoff) or level >= max_level:
@@ -197,7 +196,7 @@ def find_leaves(
             return results
 
         else:
-            # Add direct emissions from this CPC product
+            # Add direct emissions from this demand
             direct = (
                 lca_obj.characterization_matrix
                 * lca_obj.biosphere_matrix
@@ -285,7 +284,7 @@ def compare_activities_by_grouped_leaves(
 
     """
     for act in activities:
-        if not isinstance(act, bd.backends.peewee.proxies.Activity):
+        if not isinstance(act, bd.backends.proxies.Activity):
             raise ValueError("`activities` must be an iterable of `Activity` instances")
 
     objs = [
@@ -326,7 +325,7 @@ def compare_activities_by_grouped_leaves(
     ] + [key for _, key in sorted_keys]
     data = []
     for act, lst in zip(activities, objs):
-        lca.redo_lcia({act: 1})
+        lca.redo_lcia({act.id: 1})
         data.append(
             [
                 act["name"].replace(name_common, ""),

@@ -2,6 +2,13 @@
 
 Note: This changelog is not exhaustive. Each release also include small bug fixes and cleanups.
 
+## 0.11 (2021-10-21)
+
+* Brightway 2.5 compatibility
+* Removed `DatabaseExplorer`
+* Removed `ParameterFinder`
+* Deprecated `SerializedLCAReport`
+
 ## 0.10 (2021-05-06)
 
 * Add `compare_activities_by_grouped_leaves` function.

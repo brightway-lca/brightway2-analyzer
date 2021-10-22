@@ -1,9 +1,10 @@
+import sys
+from warnings import warn
+
 import bw2calc as bc
 import numpy as np
 import pyprind
-from bw2data import Database, databases, methods, get_activity
-from warnings import warn
-import sys
+from bw2data import Database, databases, get_activity, methods
 
 
 def contribution_for_all_datasets_one_method(database, method, progress=True):
@@ -150,7 +151,10 @@ def print_recursive_calculation(
             warn("Hit multiple production exchanges; aborting in this branch")
             return
         else:
-            prod_amount = lca_obj.technosphere_matrix[lca_obj.dicts.product[prod_exchanges[0].input.id], lca_obj.dicts.activity[prod_exchanges[0].output.id]]
+            prod_amount = lca_obj.technosphere_matrix[
+                lca_obj.dicts.product[prod_exchanges[0].input.id],
+                lca_obj.dicts.activity[prod_exchanges[0].output.id],
+            ]
 
         for exc in activity.technosphere():
             if exc.input.id == exc.output.id:
@@ -214,10 +218,10 @@ def print_recursive_supply_chain(
             warn("Hit multiple production exchanges; aborting in this branch")
             return
         else:
-            prod_amount = prod_exchanges[0]['amount']
+            prod_amount = prod_exchanges[0]["amount"]
             for other in activity.technosphere():
                 if other.input == prod_exchanges[0].input:
-                    prod_amount -= other['amount']
+                    prod_amount -= other["amount"]
 
         for exc in activity.technosphere():
             if exc.input.id == exc.output.id:

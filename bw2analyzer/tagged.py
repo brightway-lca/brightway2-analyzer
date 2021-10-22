@@ -1,7 +1,8 @@
 from collections import defaultdict
+from warnings import warn
 
 from bw2calc import LCA
-from bw2data import Method, get_activity
+from bw2data import Method, get_activity, Database
 
 
 def traverse_tagged_databases(
@@ -146,7 +147,7 @@ def aggregate_tagged_graph(graph):
 
 
 def recurse_tagged_database(
-    activity, amount, method_dict, lca, label, default_tag, secondary_tags=[], fg_databases=None
+    activity, amount, method_dict, lca, label, default_tag, secondary_tags=[], fg_databases=None, warned=False
 ):
 
     """Traverse a foreground database and assess activities and biosphere flows by tags.
@@ -188,26 +189,28 @@ def recurse_tagged_database(
     if isinstance(activity, tuple):
         activity = get_activity(activity)
 
-    if fg_databases == None: # then set the list equal to the database of the functional unit 
-    
-        fg_databases = [activity['database']] # list, single item
-    
-    elif fg_databases == list(bw2.Database(activity['database']).find_graph_dependents()): 
-        # check that the list fg_databases does not include all the databases involved in the FU 
-        # (otherwise, it would mean we are likely to have to recurse through ecoinvent... not funny)
-        # ideally, should only on first call of recurse_tagged_database
-        raise Exception('The list of databases to traverse fg_databases should not be equal to the all databases involved in the project. You risk to attempt to traverse a background database like ecoinvent - it would take too much time')
+    MESSAGE = """Given databases include many activities, and traversal may be slow.
+Consider using `GraphTraversalLCA` from `bw2calc` instead."""
+
+    if fg_databases is None:  # then set the list equal to the database of the functional unit
+        fg_databases = [activity['database']]  # list, single item
+    elif not warned and sum(len(Database(name)) for name in fg_databases) > 2500:
+        warn(MESSAGE)
+        warned = True
 
     inputs = list(activity.technosphere())
     production = list(activity.production())
 
-    if len(production) == 1:
-        scale = production[0]["amount"]
-    elif not production:
-        # Assume production amount of 1
+    if not production:
         scale = 1
+    elif len(production) > 1:
+        warn("Hit multiple production exchanges; aborting in this branch")
+        return
     else:
-        raise ValueError("Can't scale by production exchange")
+        scale = production[0]["amount"]
+        for other in activity.technosphere():
+            if other.input == production[0].input:
+                scale -= other["amount"]
 
     inside = [exc for exc in inputs if exc.input["database"] in fg_databases]
 
@@ -245,14 +248,15 @@ def recurse_tagged_database(
         ],
         "technosphere": [
             recurse_tagged_database(
-                exc.input,
-                exc["amount"] / scale * amount,
-                method_dict,
-                lca,
-                label,
-                default_tag,
-                secondary_tags,
-                fg_databases
+                activity=exc.input,
+                amount=exc["amount"] / scale * amount,
+                method_dict=method_dict,
+                lca=lca,
+                label=label,
+                default_tag=default_tag,
+                secondary_tags=secondary_tags,
+                fg_databases=fg_databases,
+                warned=warned,
             )
             for exc in inside
         ],

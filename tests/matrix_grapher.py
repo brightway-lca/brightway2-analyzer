@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from eight import *
-
 from .fixtures import lci_fixture
 from bw2analyzer.matrix_grapher import SparseMatrixGrapher
 from bw2calc import LCA

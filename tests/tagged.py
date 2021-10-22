@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from eight import *
-
 from bw2analyzer.tagged import (
     traverse_tagged_databases,
     multi_traverse_tagged_databases,
@@ -10,14 +6,12 @@ from bw2analyzer.tagged import (
 )
 from bw2data import Database, Method, get_activity
 from bw2data.tests import bw2test
-import numpy as np
 import pytest
 
 
 @pytest.fixture
 @bw2test
 def tagged_fixture():
-
     Database("biosphere").write(
         {
             ("biosphere", "bad"): {"name": "bad", "type": "emission"},
@@ -26,23 +20,19 @@ def tagged_fixture():
     )
 
     method = Method(("test method",))
-
     method.register()
-
-    method.write(
-        [(("biosphere", "bad"), 2), (("biosphere", "worse"), 3),]
-    )
+    method.write([(("biosphere", "bad"), 2), (("biosphere", "worse"), 3)])
 
     Database("background").write(
         {
             ("background", "first"): {
                 "exchanges": [
-                    {"input": ("biosphere", "bad"), "amount": 1, "type": "biosphere",}
+                    {"input": ("biosphere", "bad"), "amount": 1, "type": "biosphere"}
                 ],
             },
             ("background", "second"): {
                 "exchanges": [
-                    {"input": ("biosphere", "worse"), "amount": 1, "type": "biosphere",}
+                    {"input": ("biosphere", "worse"), "amount": 1, "type": "biosphere"}
                 ],
             },
         }
@@ -98,7 +88,7 @@ def tagged_fixture():
                 "tag field": "C",
                 "secondary tag": "X",
                 "exchanges": [
-                    {"input": ("biosphere", "bad"), "amount": 8, "type": "biosphere",},
+                    {"input": ("biosphere", "bad"), "amount": 8, "type": "biosphere"},
                     {
                         "input": ("biosphere", "worse"),
                         "amount": 7,
@@ -257,7 +247,10 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
     method = Method(("test method",))
     method.register()
     method.write(
-        [(("biosphere", "bad"), 2), (("biosphere", "worse"), 3),]
+        [
+            (("biosphere", "bad"), 2),
+            (("biosphere", "worse"), 3),
+        ]
     )
     Database("background").write(
         {
@@ -294,7 +287,11 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
                         "amount": 4,
                         "type": "technosphere",
                     },
-                    {"input": ("foreground", "fu"), "amount": 2, "type": "production",},
+                    {
+                        "input": ("foreground", "fu"),
+                        "amount": 2,
+                        "type": "production",
+                    },
                 ],
             },
             ("foreground", "i"): {
@@ -326,14 +323,22 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
             ("foreground", "ii"): {
                 "tag field": "C",
                 "exchanges": [
-                    {"input": ("biosphere", "bad"), "amount": 8, "type": "biosphere",},
+                    {
+                        "input": ("biosphere", "bad"),
+                        "amount": 8,
+                        "type": "biosphere",
+                    },
                     {
                         "input": ("biosphere", "worse"),
                         "amount": 7,
                         "tag field": "D",
                         "type": "biosphere",
                     },
-                    {"input": ("foreground", "ii"), "amount": 3, "type": "production",},
+                    {
+                        "input": ("foreground", "ii"),
+                        "amount": 3,
+                        "type": "production",
+                    },
                 ],
             },
             ("foreground", "iii"): {

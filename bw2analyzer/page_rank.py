@@ -1,53 +1,55 @@
-from bw2data import Database
 from bw2calc import LCA
-from numpy import array, ones, absolute, dot, where
+from bw2data import Database
+from numpy import absolute, array, dot, ones, where
 
 
 class ConvergenceError(Exception):
     pass
 
 
-class PageRank(object):
+class PageRank:
     def __init__(self, database):
         self.database = database
 
     def calculate(self):
         self.lca = LCA({self.database.random(): 1})
         self.lca.lci()
-        self.ra, _, _ = self.lca.reverse_dict()
         self.matrix = self.lca.technosphere_matrix.transpose()
-        self.pr = [(x[0], self.ra[x[1]]) for x in self.page_rank(self.matrix)]
+        self.pr = [
+            (x[0], self.lca.dicts.activity.reversed[x[1]])
+            for x in self.page_rank(self.matrix)
+        ]
         return self.pr
 
     def page_rank(self, technosphere, alpha=0.85, max_iter=100, tol=1e-6):
         """
-Return the PageRank of the nodes in the graph.
+        Return the PageRank of the nodes in the graph.
 
-Adapted from http://networkx.lanl.gov/svn/networkx/trunk/networkx/algorithms/link_analysis/pagerank_alg.py
+        Adapted from http://networkx.lanl.gov/svn/networkx/trunk/networkx/algorithms/link_analysis/pagerank_alg.py
 
-PageRank computes a ranking of the nodes in the graph G based on
-the structure of the incoming links. It was originally designed as
-an algorithm to rank web pages.
+        PageRank computes a ranking of the nodes in the graph G based on
+        the structure of the incoming links. It was originally designed as
+        an algorithm to rank web pages.
 
-The eigenvector calculation uses power iteration with a SciPy
-sparse matrix representation.
+        The eigenvector calculation uses power iteration with a SciPy
+        sparse matrix representation.
 
-Args:
-    * *technosphere* (scipy sparse matrix): The technosphere matrix.
-    * *alpha* (float, optional): Damping parameter for PageRank, default=0.85
+        Args:
+            * *technosphere* (scipy sparse matrix): The technosphere matrix.
+            * *alpha* (float, optional): Damping parameter for PageRank, default=0.85
 
-Returns:
-    * Dictionary of nodes (activity codes) with value as PageRank
+        Returns:
+            * Dictionary of nodes (activity codes) with value as PageRank
 
 
-References
+        References
 
-.. [1] A. Langville and C. Meyer,
-   "A survey of eigenvector methods of web information retrieval."
-   http://citeseer.ist.psu.edu/713792.html
-.. [2] Page, Lawrence; Brin, Sergey; Motwani, Rajeev and Winograd, Terry,
-   The PageRank citation ranking: Bringing order to the Web. 1999
-   http://dbpubs.stanford.edu:8090/pub/showDoc.Fulltext?lang=en&doc=1999-66&format=pdf
+        .. [1] A. Langville and C. Meyer,
+           "A survey of eigenvector methods of web information retrieval."
+           http://citeseer.ist.psu.edu/713792.html
+        .. [2] Page, Lawrence; Brin, Sergey; Motwani, Rajeev and Winograd, Terry,
+           The PageRank citation ranking: Bringing order to the Web. 1999
+           http://dbpubs.stanford.edu:8090/pub/showDoc.Fulltext?lang=en&doc=1999-66&format=pdf
         """
         mat = technosphere.copy()
         (n, m) = mat.shape

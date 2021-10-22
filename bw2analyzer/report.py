@@ -1,16 +1,18 @@
-from .contribution import ContributionAnalysis
-from .econ import herfindahl_index, concentration_ratio
-from .sc_graph import GTManipulator
-from bw2data import JsonWrapper, methods, config, projects, get_activity
-from bw2calc import ParallelMonteCarlo, LCA, GraphTraversal
-from scipy.stats import gaussian_kde
-import numpy as np
 import os
-import requests
 import uuid
 
+import numpy as np
+import requests
+from bw2calc import LCA, GraphTraversal, ParallelMonteCarlo
+from bw2data import JsonWrapper, config, get_activity, methods, projects
+from scipy.stats import gaussian_kde
 
-class SerializedLCAReport(object):
+from .contribution import ContributionAnalysis
+from .econ import concentration_ratio, herfindahl_index
+from .sc_graph import GTManipulator
+
+
+class SerializedLCAReport:
     """A complete LCA report (i.e. LCA score, Monte Carlo uncertainty analysis, contribution analysis) that can be serialized to a defined standard."""
 
     version = 2
@@ -114,7 +116,13 @@ class SerializedLCAReport(object):
         print("Histogram")
         hist_ys, hist_xs = np.histogram(mc_data, bins=num_bins, density=True)
         hist_xs = np.repeat(hist_xs, 2)
-        hist_ys = np.hstack((np.array(0), np.repeat(hist_ys, 2), np.array(0),))
+        hist_ys = np.hstack(
+            (
+                np.array(0),
+                np.repeat(hist_ys, 2),
+                np.array(0),
+            )
+        )
         print("Finished .get_monte_carlo")
         return {
             "smoothed": zip(kde_xs.tolist(), kde_ys.tolist()),

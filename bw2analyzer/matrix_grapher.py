@@ -1,9 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 
 
-class SparseMatrixGrapher(object):
+class SparseMatrixGrapher:
     def __init__(self, matrix):
         self.matrix = matrix
 

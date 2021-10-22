@@ -1,20 +1,28 @@
-# -*- coding: utf-8 -*
 __all__ = [
+    "compare_activities_by_grouped_leaves",
+    "compare_activities_by_lcia_score",
     "ContributionAnalysis",
-    "DatabaseExplorer",
     "DatabaseHealthCheck",
+    "find_differences_in_inputs",
     "GTManipulator",
     "PageRank",
-    "SerializedLCAReport",
+    "print_recursive_calculation",
+    "print_recursive_supply_chain",
+    # "SerializedLCAReport",
     "traverse_tagged_databases",
 ]
 
-__version__ = (0, 9, 4)
-
+from .comparisons import (
+    compare_activities_by_grouped_leaves,
+    compare_activities_by_lcia_score,
+    find_differences_in_inputs,
+)
 from .contribution import ContributionAnalysis
-from .explorer import DatabaseExplorer
 from .health_check import DatabaseHealthCheck
 from .page_rank import PageRank
-from .report import SerializedLCAReport
+
+# from .report import SerializedLCAReport
 from .sc_graph import GTManipulator
 from .tagged import traverse_tagged_databases
+from .utils import print_recursive_calculation, print_recursive_supply_chain
+from .version import version as __version__

@@ -1,6 +1,7 @@
-from bw2data import get_activity, Method
-from bw2calc import LCA
 from collections import defaultdict
+
+from bw2calc import LCA
+from bw2data import Method, get_activity
 
 
 def traverse_tagged_databases(
@@ -104,9 +105,7 @@ def traverse_tagged_databases(
     """
 
     lca = LCA(functional_unit, method)
-
-    lca.lci(factorize=True)
-
+    lca.lci()
     lca.lcia()
 
     method_dict = {o[0]: o[1] for o in Method(method).load()}
@@ -155,64 +154,38 @@ def recurse_tagged_database(
 
     Input arguments:
 
-
         * ``activity``: Activity tuple or object
-
         * ``amount``: float
-
         * ``method_dict``: Dictionary of biosphere flow tuples to CFs, e.g. ``{("biosphere", "foo"): 3}``
-
         * ``lca``: An ``LCA`` object that is already initialized, i.e. has already calculated LCI and LCIA with same method as in ``method_dict``
-
         * ``label``: string
-
         * ``default_tag``: string
-
         * ``secondary_tags``: List of tuples in the format (secondary_label, secondary_default_tag). Default is empty list.
         
         * ``fg_databases``: a list of foreground databases to be traversed, e.g. ['foreground', 'biomass', 'machinery']
                             It's not recommended to include all databases of a project in the list to be traversed, especially not ecoinvent itself
 
-
     Returns:
-
 
     .. code-block:: python
 
-
         {
-
             'activity': activity object,
-
             'amount': float,
-
             'tag': string,
-
             'secondary_tags': [list of strings],
-
             'impact': float (impact of inputs from outside foreground database),
-
             'biosphere': [{
-
                 'amount': float,
-
                 'impact': float,
-
                 'tag': string,
-
                 'secondary_tags': [list of strings]
-
             }],
-
             'technosphere': [this data structure]
-
         }
 
-
     """
-
     if isinstance(activity, tuple):
-
         activity = get_activity(activity)
 
     if fg_databases == None: # then set the list equal to the database of the functional unit 
@@ -226,8 +199,8 @@ def recurse_tagged_database(
         raise Exception('The list of databases to traverse fg_databases should not be equal to the all databases involved in the project. You risk to attempt to traverse a background database like ecoinvent - it would take too much time')
 
     inputs = list(activity.technosphere())
-
     production = list(activity.production())
+
     if len(production) == 1:
         scale = production[0]["amount"]
     elif not production:
@@ -236,22 +209,18 @@ def recurse_tagged_database(
     else:
         raise ValueError("Can't scale by production exchange")
 
-    inside = [exc for exc in inputs if exc["input"][0] in fg_databases]
+    inside = [exc for exc in inputs if exc.input["database"] in fg_databases]
 
     outside = {
-        exc["input"]: exc["amount"] / scale * amount
+        exc.input.id: exc["amount"] / scale * amount
         for exc in inputs
         if exc["input"][0] not in fg_databases
     }
 
     if outside:
-
         lca.redo_lcia(outside)
-
         outside_score = lca.score
-
     else:
-
         outside_score = 0
 
     return {
@@ -411,9 +380,9 @@ def multi_recurse_tagged_database(
         activity = get_activity(activity)
 
     inputs = list(activity.technosphere())
-    inside = [exc for exc in inputs if exc["input"][0] == activity["database"]]
+    inside = [exc for exc in inputs if exc.input["database"] == activity["database"]]
     outside = {
-        exc["input"]: exc["amount"] * amount
+        exc.input.id: exc["amount"] * amount
         for exc in inputs
         if exc["input"][0] != activity["database"]
     }

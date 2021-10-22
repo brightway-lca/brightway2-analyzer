@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
-from eight import *
-
 from .fixtures import lci_fixture, method_fixture
 from bw2analyzer.health_check import DatabaseHealthCheck
 from bw2data import Database, Method
@@ -15,9 +11,13 @@ class DHCMock(DatabaseHealthCheck):
 
 class HealthCheckTestCase(BW2DataTest):
     def test_health_check(self):
+        Database("c").write({("c", "flow"): {"type": "emission"}})
+
         db = Database("a")
         db.write(lci_fixture)
+
         method = Method(("method",))
         method.register()
         method.write(method_fixture)
-        dhc = DHCMock("a").check()
+
+        DHCMock("a").check()

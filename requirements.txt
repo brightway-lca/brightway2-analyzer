@@ -4,9 +4,11 @@ docopt
 lxml
 matplotlib
 numpy
+pandas
 pyprind
 requests
 scipy
 stats_arrays
+tabulate
 unicodecsv
 voluptuous

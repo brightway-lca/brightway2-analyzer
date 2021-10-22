@@ -1,14 +1,21 @@
-from .matrix_grapher import SparseMatrixGrapher
-from .page_rank import PageRank
-from bw2calc import LCA
-from bw2data import Database, projects
-from bw_processing import safe_filename
-from stats_arrays import *
-import numpy as np
 import os
 
+import numpy as np
+from bw2calc import LCA
+from bw2data import Database, projects
+from stats_arrays import (
+    LognormalUncertainty,
+    NormalUncertainty,
+    TriangularUncertainty,
+    UniformUncertainty,
+    uncertainty_choices,
+)
 
-class DatabaseHealthCheck(object):
+from .matrix_grapher import SparseMatrixGrapher
+from .page_rank import PageRank
+
+
+class DatabaseHealthCheck:
     def __init__(self, database):
         self.db = Database(database)
         self.db.filters = {"type": "process"}
@@ -28,16 +35,16 @@ class DatabaseHealthCheck(object):
             "me": aggregated["many_exchanges"],
             "nsp": self.no_self_production(),
             "mo": self.multioutput_processes(),
-            "ob": self.ouroboros(),
+            "ob": {},
         }
 
     def make_graphs(self, graphs_dir=None):
         lca = LCA({self.db.random(): 1})
         lca.lci()
-        tech_filename = safe_filename(self.db.name) + ".technosphere.png"
+        tech_filename = self.db.filename + ".technosphere.png"
         tech_filepath = os.path.join(graphs_dir or projects.output_dir, tech_filename)
         SparseMatrixGrapher(lca.technosphere_matrix).graph(tech_filepath, dpi=600)
-        bio_filename = safe_filename(self.db.name) + ".biosphere.png"
+        bio_filename = self.db.filename + ".biosphere.png"
         bio_filepath = os.path.join(graphs_dir or projects.output_dir, bio_filename)
         SparseMatrixGrapher(lca.biosphere_matrix).graph(bio_filepath, dpi=600)
         return tech_filepath, tech_filename, bio_filepath, bio_filename
@@ -136,34 +143,32 @@ class DatabaseHealthCheck(object):
         return {"system_processes": system_processes, "many_exchanges": many_exchanges}
 
     def no_self_production(self):
-        self_production = lambda a, b: not a or b in a
-        return {
-            key
-            for key, value in self.db.load().items()
-            if value.get("type", "process") == "process"
-            and not self_production(
-                {
-                    exc["input"]
-                    for exc in value.get("exchanges", [])
-                    if exc["type"] == "production"
-                },
-                key,
+        def self_production(ds):
+            return any(
+                exc.input == exc.output
+                for exc in ds.get("exchanges", [])
+                if exc["type"] in ("production", "generic production")
             )
+
+        return {
+            ds.key
+            for ds in self.db
+            if ds.get("type", "process") == "process" and not self_production(ds)
         }
 
-    def ouroboros(self):
-        """Find processes that consume their own reference products as inputs. Not necessarily an error, but should be examined carefully (see `Two potential points of confusion in LCA math <http://chris.mutel.org/too-confusing.html>`__).
+    # def ouroboros(self):
+    #     """Find processes that consume their own reference products as inputs. Not necessarily an error, but should be examined carefully (see `Two potential points of confusion in LCA math <http://chris.mutel.org/too-confusing.html>`__).
 
-        Returns:
-            A set of database keys.
+    #     Returns:
+    #         A set of database keys.
 
-        """
-        return {
-            key
-            for key, value in self.db.load().items()
-            if any(
-                exc
-                for exc in value.get("exchanges", [])
-                if exc["input"] == key and exc["type"] == "technosphere"
-            )
-        }
+    #     """
+    #     return {
+    #         key
+    #         for key, value in self.db.load().items()
+    #         if any(
+    #             exc
+    #             for exc in value.get("exchanges", [])
+    #             if exc["input"] == key and exc["type"] == "technosphere"
+    #         )
+    #     }

@@ -2,6 +2,10 @@
 
 Note: This changelog is not exhaustive. Each release also include small bug fixes and cleanups.
 
+### DEV
+
+* Fix bug in [non-unitary production amounts for recursive calculations](https://github.com/brightway-lca/from-the-ground-up/issues/1)
+
 ## 0.11 (2021-10-21)
 
 * Brightway 2.5 compatibility

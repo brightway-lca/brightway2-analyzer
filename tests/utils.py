@@ -4,7 +4,78 @@ from bw2data.tests import bw2test
 import bw2data as bd
 import bw2calc as bc
 import io
+import pytest
 
+
+@bw2test
+def test_print_recursive_calculation_nonunitary_production(capsys):
+    bd.Database("f").write({
+        ("f", "b"): {"exchanges": [], 'type': 'emission'},
+        ("f", "1"): {"exchanges": [
+            {'input': ("f", "1"), 'amount': 2, 'type': 'production'},
+            {'input': ("f", "2"), 'amount': 2, 'type': 'technosphere'},
+        ]},
+        ("f", "2"): {"exchanges": [
+            {'input': ("f", "b"), 'amount': 1, 'type': 'biosphere'},
+
+        ]},
+    })
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+    print_recursive_calculation(("f", "1"), ("m",))
+    expected = """Fraction of score | Absolute score | Amount | Activity
+0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+  0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
+
+@bw2test
+def test_print_recursive_calculation_nonunitary_production_losses(capsys):
+    bd.Database("f").write({
+        ("f", "b"): {"exchanges": [], 'type': 'emission'},
+        ("f", "1"): {"exchanges": [
+            {'input': ("f", "1"), 'amount': 3, 'type': 'production'},
+            {'input': ("f", "1"), 'amount': 1, 'type': 'technosphere'},
+            {'input': ("f", "2"), 'amount': 2, 'type': 'technosphere'},
+        ]},
+        ("f", "2"): {"exchanges": [
+            {'input': ("f", "b"), 'amount': 1, 'type': 'biosphere'},
+
+        ]},
+    })
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+    print_recursive_calculation(("f", "1"), ("m",))
+    expected = """Fraction of score | Absolute score | Amount | Activity
+0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+  0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
+
+
+@bw2test
+def test_print_recursive_calculation_nonunitary_production_multiple_production(capsys):
+    bd.Database("f").write({
+        ("f", "b"): {"exchanges": [], 'type': 'emission'},
+        ("f", "1"): {"exchanges": [
+            {'input': ("f", "1"), 'amount': 1, 'type': 'production'},
+            {'input': ("f", "1"), 'amount': 1, 'type': 'production'},
+            {'input': ("f", "2"), 'amount': 2, 'type': 'technosphere'},
+        ]},
+        ("f", "2"): {"exchanges": [
+            {'input': ("f", "b"), 'amount': 1, 'type': 'biosphere'},
+
+        ]},
+    })
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+    with pytest.warns(UserWarning, match="Hit multiple production exchanges"):
+        print_recursive_calculation(("f", "1"), ("m",))
+
+    expected = """Fraction of score | Absolute score | Amount | Activity
+0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
 
 @bw2test
 def test_print_recursive_calculation(capsys):
@@ -130,4 +201,68 @@ def test_print_recursive_supply_chain(capsys):
 """
     assert capsys.readouterr().out == expected
 
-    # amount
+
+@bw2test
+def test_print_recursive_supply_chain_nonunitary_production(capsys):
+    bd.Database("f").write({
+        ("f", "b"): {"exchanges": [], 'type': 'emission'},
+        ("f", "1"): {"exchanges": [
+            {'input': ("f", "1"), 'amount': 2, 'type': 'production'},
+            {'input': ("f", "2"), 'amount': 2, 'type': 'technosphere'},
+        ]},
+        ("f", "2"): {"exchanges": [
+            {'input': ("f", "b"), 'amount': 1, 'type': 'biosphere'},
+
+        ]},
+    })
+
+    print_recursive_supply_chain(("f", "1"))
+    expected = """1: Activity with missing fields (call ``valid(why=True)`` to see more)
+  1: Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
+
+
+@bw2test
+def test_print_recursive_supply_chain_nonunitary_production_losses(capsys):
+    bd.Database("f").write({
+        ("f", "b"): {"exchanges": [], 'type': 'emission'},
+        ("f", "1"): {"exchanges": [
+            {'input': ("f", "1"), 'amount': 3, 'type': 'production'},
+            {'input': ("f", "1"), 'amount': 1, 'type': 'technosphere'},
+            {'input': ("f", "2"), 'amount': 2, 'type': 'technosphere'},
+        ]},
+        ("f", "2"): {"exchanges": [
+            {'input': ("f", "b"), 'amount': 1, 'type': 'biosphere'},
+
+        ]},
+    })
+
+    print_recursive_supply_chain(("f", "1"))
+    expected = """1: Activity with missing fields (call ``valid(why=True)`` to see more)
+  1: Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
+
+
+@bw2test
+def test_print_recursive_supply_chain_nonunitary_production_multiple_production(capsys):
+    bd.Database("f").write({
+        ("f", "b"): {"exchanges": [], 'type': 'emission'},
+        ("f", "1"): {"exchanges": [
+            {'input': ("f", "1"), 'amount': 1, 'type': 'production'},
+            {'input': ("f", "1"), 'amount': 1, 'type': 'production'},
+            {'input': ("f", "2"), 'amount': 2, 'type': 'technosphere'},
+        ]},
+        ("f", "2"): {"exchanges": [
+            {'input': ("f", "b"), 'amount': 1, 'type': 'biosphere'},
+
+        ]},
+    })
+
+    with pytest.warns(UserWarning, match="Hit multiple production exchanges"):
+        print_recursive_supply_chain(("f", "1"))
+
+    expected = """1: Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected

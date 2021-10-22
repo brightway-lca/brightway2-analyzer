@@ -1,9 +1,9 @@
-from time import time
-
 import bw2calc as bc
 import numpy as np
 import pyprind
-from bw2data import Database, Method, config, databases, mapping, methods
+from bw2data import Database, databases, methods, get_activity
+from warnings import warn
+import sys
 
 
 def contribution_for_all_datasets_one_method(database, method, progress=True):
@@ -16,7 +16,6 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
     Returns:
         NumPy array of relative contributions. Each column sums to one.
         Lookup dictionary, dataset keys to row/column indices
-        Total elapsed time in seconds
 
     """
 
@@ -118,6 +117,9 @@ def print_recursive_calculation(
         Nothing. Prints to ``sys.stdout`` or ``file_obj``
 
     """
+    activity = get_activity(activity)
+    if file_obj is None:
+        file_obj = sys.stdout
 
     if lca_obj is None:
         lca_obj = bc.LCA({activity: amount}, lcia_method)
@@ -131,11 +133,7 @@ def print_recursive_calculation(
         if abs(lca_obj.score) <= abs(total_score * cutoff):
             return
     if first:
-        message = "Fraction of score | Absolute score | Amount | Activity"
-        if file_obj is not None:
-            file_obj.write(message + "\n")
-        else:
-            print(message)
+        file_obj.write("Fraction of score | Absolute score | Amount | Activity\n")
     message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(
         tab_character * level,
         lca_obj.score / total_score,
@@ -143,16 +141,24 @@ def print_recursive_calculation(
         float(amount),
         str(activity),
     )
-    if file_obj is not None:
-        file_obj.write(message + "\n")
-    else:
-        print(message)
+    file_obj.write(message + "\n")
     if level < max_level:
+        prod_exchanges = list(activity.production())
+        if not prod_exchanges:
+            prod_amount = 1
+        elif len(prod_exchanges) > 1:
+            warn("Hit multiple production exchanges; aborting in this branch")
+            return
+        else:
+            prod_amount = lca_obj.technosphere_matrix[lca_obj.dicts.product[prod_exchanges[0].input.id], lca_obj.dicts.activity[prod_exchanges[0].output.id]]
+
         for exc in activity.technosphere():
+            if exc.input.id == exc.output.id:
+                continue
             print_recursive_calculation(
                 activity=exc.input,
                 lcia_method=lcia_method,
-                amount=amount * exc["amount"],
+                amount=amount * exc["amount"] / prod_amount,
                 max_level=max_level,
                 cutoff=cutoff,
                 first=False,
@@ -177,6 +183,8 @@ def print_recursive_supply_chain(
 
     This function is only for exploration; use ``bw2calc.GraphTraversal`` for a better performing function.
 
+    The results displayed here can also be incorrect if
+
     Args:
         activity: ``Activity``. The starting point of the supply chain graph.
         amount: int. Supply chain inputs will be scaled to this value.
@@ -190,19 +198,33 @@ def print_recursive_supply_chain(
         Nothing. Prints to ``stdout`` or ``file_obj``
 
     """
+    activity = get_activity(activity)
+    if file_obj is None:
+        file_obj = sys.stdout
 
     if cutoff > 0 and amount < cutoff:
         return
     message = "{}{:.3g}: {:.70}".format(tab_character * level, amount, str(activity))
-    if file_obj is not None:
-        file_obj.write(message + "\n")
-    else:
-        print(message)
+    file_obj.write(message + "\n")
     if level < max_level:
+        prod_exchanges = list(activity.production())
+        if not prod_exchanges:
+            prod_amount = 1
+        elif len(prod_exchanges) > 1:
+            warn("Hit multiple production exchanges; aborting in this branch")
+            return
+        else:
+            prod_amount = prod_exchanges[0]['amount']
+            for other in activity.technosphere():
+                if other.input == prod_exchanges[0].input:
+                    prod_amount -= other['amount']
+
         for exc in activity.technosphere():
+            if exc.input.id == exc.output.id:
+                continue
             print_recursive_supply_chain(
                 activity=exc.input,
-                amount=amount * exc["amount"],
+                amount=amount * exc["amount"] / prod_amount,
                 level=level + 1,
                 max_level=max_level,
                 cutoff=cutoff,

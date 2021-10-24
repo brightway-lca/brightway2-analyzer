@@ -10,98 +10,59 @@ def traverse_tagged_databases(
 ):
 
     """Traverse a functional unit throughout its foreground database(s) or the 
-    
     listed databses in fg_databses, and group impacts by tag label.
 
-
     Contribution analysis work by linking impacts to individual activities.
-
     However, you also might want to group impacts in other ways. For example,
-
     give individual biosphere exchanges their own grouping, or aggregate two
-
     activities together.
 
-
     Consider this example system, where the letters are the tag labels, and the
-
     numbers are exchange amounts. The functional unit is one unit of the tree
-
     root.
 
-
     .. image:: images/tagged-traversal.png
-
        :alt: Example tagged supply chain
 
-
     In this supply chain, tags are applied to activities and biosphere exchanges.
-
     If a biosphere exchange is not tagged, it inherits the tag of its producing
-
     activity. Similarly, links to other databases are assessed with the usual
-
     LCA machinery, and the total LCA score is tagged according to its consuming
-
     activity. If an activity does not have a tag, a default tag is applied.
-
 
     We can change our visualization to show the use of the default tags:
 
-
     .. image:: images/tagged-traversal-2.png
-
        :alt: Example tagged supply chain
 
-
     And then we can manually calculate the tagged impacts. Normally we would
-
     need to know the actual biosphere flows and their respective
-
     characterization factors (CF), but in this example we assume that each
-
     CF is one. Our result, group by tags, would therefore be:
 
-
         * **A**: :math:`6 + 27 = 33`
-
         * **B**: :math:`30 + 44 = 74`
-
         * **C**: :math:`5 + 16 + 48 = 69`
-
         * **D**: :math:`14`
 
-
     This function will only traverse the foreground database, i.e. the
-
     database of the functional unit activity. A functional unit can have
-
     multiple starting nodes; in this case, all foreground databases are
-
     traversed.
-
 
     Input arguments:
 
         * ``functional_unit``: A functional unit dictionary, e.g. ``{("foo", "bar"): 42}``.
-
         * ``method``: A method name, e.g. ``("foo", "bar")``
-
         * ``label``: The label of the tag classifier. Default is ``"tag"``
-
         * ``default_tag``: The tag classifier to use if none was given. Default is ``"other"``
-
         * ``secondary_tags``: List of tuples in the format (secondary_label, secondary_default_tag). Default is empty list.
-        
         * ``fg_databases``: a list of foreground databases to be traversed, e.g. ['foreground', 'biomass', 'machinery']
                             It's not recommended to include all databases of a project in the list to be traversed, especially not ecoinvent itself
 
-
     Returns:
 
-
         Aggregated tags dictionary from ``aggregate_tagged_graph``, and tagged supply chain graph from ``recurse_tagged_database``.
-
 
     """
 

@@ -18,7 +18,7 @@ recursive_fixture = {
     ("a", "1"): {
         "name": "process 1",
         "unit": "b",
-        "location": "c",
+        "location": "RU",
         "exchanges": [
             {"input": ("a", "flow"), "type": "biosphere", "amount": 2},
             {"input": ("a", "2"), "type": "technosphere", "amount": 0.8},
@@ -27,7 +27,7 @@ recursive_fixture = {
     ("a", "2"): {
         "name": "process 2",
         "unit": "b",
-        "location": "c",
+        "location": "UA",
         "exchanges": [
             {"input": ("a", "flow"), "type": "biosphere", "amount": 0.5},
             {"input": ("a", "3"), "type": "technosphere", "amount": 0.6},
@@ -36,7 +36,7 @@ recursive_fixture = {
     ("a", "3"): {
         "name": "process 3",
         "unit": "b",
-        "location": "c",
+        "location": "BY",
         "exchanges": [
             {"input": ("a", "4"), "type": "technosphere", "amount": 10},
             {"input": ("a", "5"), "type": "technosphere", "amount": 0.1},
@@ -45,7 +45,7 @@ recursive_fixture = {
     ("a", "4"): {
         "name": "process 4",
         "unit": "b",
-        "location": "c",
+        "location": "MD",
         "exchanges": [
             {"input": ("a", "flow"), "type": "biosphere", "amount": 0.005},
         ],
@@ -53,7 +53,7 @@ recursive_fixture = {
     ("a", "5"): {
         "name": "process 5",
         "unit": "b",
-        "location": "c",
+        "location": "RO",
         "exchanges": [
             {"input": ("a", "flow"), "type": "biosphere", "amount": 50},
             {"input": ("a", "1"), "type": "technosphere", "amount": 0.05},

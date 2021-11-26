@@ -195,6 +195,7 @@ Consider using `GraphTraversalLCA` from `bw2calc` instead."""
         "impact": outside_score,
         "biosphere": [
             {
+                "activity": exc.input,
                 "amount": exc["amount"] / scale * amount,
                 "impact": exc["amount"]
                 / scale

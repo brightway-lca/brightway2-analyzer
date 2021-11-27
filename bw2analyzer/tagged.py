@@ -370,6 +370,7 @@ def multi_recurse_tagged_database(
         "impact": outside_scores,
         "biosphere": [
             {
+                "activity": exc.input,
                 "amount": exc["amount"] * amount,
                 "impact": [
                     exc["amount"] * amount * method_dict.get(exc["input"], 0)

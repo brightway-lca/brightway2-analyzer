@@ -1,8 +1,9 @@
 from collections import defaultdict
 from warnings import warn
-
+import pandas as pd
 from bw2calc import LCA
 from bw2data import Method, get_activity, Database
+from typing import List, Union
 
 
 def traverse_tagged_databases(
@@ -105,6 +106,37 @@ def aggregate_tagged_graph(graph):
     for obj in graph:
         scores = recursor(obj, scores)
     return scores
+
+
+def flatten_tagged_graph(graph:dict, as_dataframe:bool=True) -> Union[List[dict],pd.DataFrame]:
+    # convert nested graph into flat edge list: [{source, target, other properties}]
+
+    def flatten_recursive(graph, target=None, agg=0):
+        # add activity metadata
+        d = graph["activity"]._data
+        # add other graph data
+        for k,v in graph.items():
+            if k in ["technosphere", "biosphere"]:
+                continue
+            else:
+                d[k] = v
+        d["source"] = len(flat_list)
+        d["target"] = target
+        flat_list.append(d)
+        # get upstream contributions
+        for ex in graph.get("biosphere", []) + graph.get("technosphere", []):
+            agg += flatten_recursive(ex, target=d["source"])
+        # calculate absolute impact (direct + upstream)
+        d["value"] = agg + d["impact"]
+        return d["value"]
+
+    flat_list = []
+    flatten_recursive(graph)
+
+    if as_dataframe is True:
+        return pd.DataFrame(flat_list).convert_dtypes({"target": pd.Int64Dtype})
+    else:
+        return flat_list
 
 
 def recurse_tagged_database(

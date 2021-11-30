@@ -1,4 +1,3 @@
-import pandas as pd
 from bw2analyzer.tagged import (
     traverse_tagged_databases,
     multi_traverse_tagged_databases,
@@ -9,7 +8,6 @@ from bw2analyzer.tagged import (
 from bw2data import Database, Method, get_activity
 from bw2data.tests import bw2test
 import pytest
-import pandas as pd
 
 
 @pytest.fixture

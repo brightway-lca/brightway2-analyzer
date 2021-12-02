@@ -46,13 +46,12 @@ def get_labeled_inventory(
 
     Args:
         * *lca* (bw2calc.LCA): LCA object whose life cycle inventory has been calculated previously.
-        * *wide_format* (bool): Whether to return a pd.DataFrame in wide format (biosphere x technosphere)
-            or a pd.Series in long format ((biosphere x technosphere) x 1)
-        * *usecols* (None, 'all' or list of column names): which metadata fields to include in the indices.
-            None means default.
+        * *wide_format* (bool): Whether to return the labeled inventory table in wide format or narrow format (for an example see https://en.wikipedia.org/wiki/Wide_and_narrow_data).
+        * *usecols* (None, 'all' or list of column names): Which metadata fields to include in the indices. None means default.
 
     Returns:
-        pd.DataFrame with activity information as row and column MultiIndices.
+        If wide_format == True: pd.DataFrame with biosphere data as row index and technosphere data as column index.
+        If wide_format == False: pd.Series with biosphere (source) and technosphere (target) data as the index.
     """
 
     assert hasattr(

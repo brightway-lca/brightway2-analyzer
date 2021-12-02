@@ -1,22 +1,18 @@
 import pandas as pd
-from bw2data import Database
+from bw2data import Database, get_activity
 from bw2calc import LCA
-from typing import List, Union
-
-
-def _get_dependent_database_names(lca: LCA) -> List[str]:
-    databases = []
-    for key in lca.remapping_dicts.keys():
-        databases += [key[0] for key in lca.remapping_dicts[key].values()]
-    return pd.unique(databases)
+from typing import List, Union, Optional
 
 
 def _load_database_metadata(
-    lca: LCA, cols: Union[None, List[str], str] = None
+    lca: LCA, cols: Optional[Union[List[str], str]] = None
 ) -> pd.DataFrame:
-    # get database names
-    databases = _get_dependent_database_names(lca)
-    # load metadata and store in one dataframe
+    # get functional unit database
+    root_db = get_activity(list(lca.demand.keys())[0])["database"]
+    # get dependent databases
+    dependent = list(Database(root_db).find_graph_dependents())
+    databases = pd.unique([root_db] + dependent)
+    # for all databases: load metadata and store in one dataframe
     df = pd.DataFrame()
     for db in databases:
         df = df.append(pd.DataFrame(Database(db)), ignore_index=True)
@@ -36,7 +32,6 @@ def _load_database_metadata(
         cols = df.columns.tolist()
     existing_cols = [c for c in cols if c in df]
     df = df[existing_cols]
-    # set index
     df = df.set_index("id")
     return df
 
@@ -44,7 +39,7 @@ def _load_database_metadata(
 def get_labeled_inventory(
     lca: LCA,
     wide_format: bool = True,
-    usecols: Union[None, List[str], str] = None,
+    usecols: Optional[Union[List[str], str]] = None,
 ) -> Union[pd.DataFrame, pd.Series]:
     """
     Take an LCA's inventory matrix and labels its rows (biosphere) and columns (technosphere) with activity metadata.

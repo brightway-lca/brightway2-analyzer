@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy.sparse.data import _data_matrix
 from bw2data import Database, get_activity
 from bw2calc import LCA
 from typing import List, Union, Optional
@@ -7,6 +8,16 @@ from typing import List, Union, Optional
 def _load_database_metadata(
     lca: LCA, cols: Optional[Union[List[str], str]] = None
 ) -> pd.DataFrame:
+    """
+    Helper function to load activity metadata from all Databases, which are relevant for a given functional unit.
+
+    Args:
+        * *lca* (bw2calc.LCA): LCA object, for which metadata should be loaded.
+        * *cols* (None, 'all' or list of column names): Which metadata fields to include in the DataFrame. None means default.
+    Returns:
+        pd.DataFrame with one row per activity and one column per activity property.
+    """
+
     # get functional unit database
     root_db = get_activity(list(lca.demand.keys())[0])["database"]
     # get dependent databases
@@ -36,16 +47,18 @@ def _load_database_metadata(
     return df
 
 
-def get_labeled_inventory(
+def _add_inventory_labels(
     lca: LCA,
+    data: _data_matrix,
     wide_format: bool = True,
     usecols: Optional[Union[List[str], str]] = None,
 ) -> Union[pd.DataFrame, pd.Series]:
     """
-    Take an LCA's inventory matrix and labels its rows (biosphere) and columns (technosphere) with activity metadata.
+    Helper function to add activity metadata to LCA.inventory or LCA.characterized_inventory.
 
     Args:
         * *lca* (bw2calc.LCA): LCA object whose life cycle inventory has been calculated previously.
+        * *data* (sparse matrix): either LCA.inventory or LCA.characterized_inventory.
         * *wide_format* (bool): Whether to return the labeled inventory table in wide format or narrow format (for an example see https://en.wikipedia.org/wiki/Wide_and_narrow_data).
         * *usecols* (None, 'all' or list of column names): Which metadata fields to include in the indices. None means default.
 
@@ -53,10 +66,6 @@ def get_labeled_inventory(
         If wide_format == True: pd.DataFrame with biosphere data as row index and technosphere data as column index.
         If wide_format == False: pd.Series with biosphere (source) and technosphere (target) data as the index.
     """
-
-    assert hasattr(
-        lca, "inventory"
-    ), "Must calculate life cycle inventory first. Please call lci()."
 
     # get activity metadata
     meta = _load_database_metadata(lca, usecols)
@@ -81,7 +90,7 @@ def get_labeled_inventory(
 
         # make dataframe with appropriate row and column indices
         df = pd.DataFrame(
-            data=lca.inventory.todense(),
+            data=data.todense(),
             index=pd.MultiIndex.from_frame(row_meta),
             columns=pd.MultiIndex.from_frame(col_meta),
         )
@@ -114,7 +123,64 @@ def get_labeled_inventory(
         index = pd.concat([row_meta, col_meta], axis=1).dropna(how="all", axis=1)
         se = pd.Series(
             index=pd.MultiIndex.from_frame(index),
-            data=lca.inventory.data,
+            data=data.data,
             name="value",
         )
         return se
+
+
+def get_labeled_inventory(
+    lca: LCA,
+    wide_format: bool = True,
+    usecols: Optional[Union[List[str], str]] = None,
+) -> Union[pd.DataFrame, pd.Series]:
+    """
+    Take an LCA's inventory matrix and label its rows (biosphere) and columns (technosphere) with activity metadata.
+
+    Args:
+        * *lca* (bw2calc.LCA): LCA object whose life cycle inventory has been calculated previously.
+        * *wide_format* (bool): Whether to return the labeled inventory table in wide format or narrow format (for an example see https://en.wikipedia.org/wiki/Wide_and_narrow_data).
+        * *usecols* (None, 'all' or list of column names): Which metadata fields to include in the indices. None means default.
+
+    Returns:
+        If wide_format == True: pd.DataFrame with biosphere data as row index and technosphere data as column index.
+        If wide_format == False: pd.Series with biosphere (source) and technosphere (target) data as the index.
+    """
+
+    assert hasattr(
+        lca, "inventory"
+    ), "Must calculate life cycle inventory first. Please call lci()."
+
+    return _add_inventory_labels(
+        lca=lca, data=lca.inventory, wide_format=wide_format, usecols=usecols
+    )
+
+
+def get_labeled_characterized_inventory(
+    lca: LCA,
+    wide_format: bool = True,
+    usecols: Optional[Union[List[str], str]] = None,
+) -> Union[pd.DataFrame, pd.Series]:
+    """
+    Take an LCA's characterized inventory matrix and label its rows (biosphere) and columns (technosphere) with activity metadata.
+
+    Args:
+        * *lca* (bw2calc.LCA): LCA object whose life cycle inventory has been calculated and characterized previously.
+        * *wide_format* (bool): Whether to return the labeled inventory table in wide format or narrow format (for an example see https://en.wikipedia.org/wiki/Wide_and_narrow_data).
+        * *usecols* (None, 'all' or list of column names): Which metadata fields to include in the indices. None means default.
+
+    Returns:
+        If wide_format == True: pd.DataFrame with biosphere data as row index and technosphere data as column index.
+        If wide_format == False: pd.Series with biosphere (source) and technosphere (target) data as the index.
+    """
+
+    assert hasattr(
+        lca, "inventory"
+    ), "Must calculate life cycle inventory first. Please call lci()."
+    assert hasattr(
+        lca, "characterized_inventory"
+    ), "Must characterize life cycle inventory first. Please call lcia()."
+
+    return _add_inventory_labels(
+        lca=lca, data=lca.characterized_inventory, wide_format=wide_format, usecols=usecols
+    )

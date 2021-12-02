@@ -168,8 +168,20 @@ def test_traverse_tagged_databases_graph(tagged_fixture):
                 {
                     "amount": 1,
                     "biosphere": [
-                        {"amount": 5, "impact": 10, "tag": "C", "secondary_tags": []},
-                        {"amount": 6, "impact": 18, "tag": "A", "secondary_tags": []},
+                        {
+                            "activity": get_activity(("biosphere", "bad")),
+                            "amount": 5,
+                            "impact": 10,
+                            "tag": "C",
+                            "secondary_tags": [],
+                        },
+                        {
+                            "activity": get_activity(("biosphere", "worse")),
+                            "amount": 6,
+                            "impact": 18,
+                            "tag": "A",
+                            "secondary_tags": [],
+                        },
                     ],
                     "activity": get_activity(("foreground", "i")),
                     "technosphere": [
@@ -177,12 +189,14 @@ def test_traverse_tagged_databases_graph(tagged_fixture):
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16,
                                     "impact": 32,
                                     "tag": "C",
                                     "secondary_tags": [],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14,
                                     "impact": 42,
                                     "tag": "D",
@@ -199,6 +213,7 @@ def test_traverse_tagged_databases_graph(tagged_fixture):
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": 54,
                                     "tag": "A",
@@ -219,7 +234,13 @@ def test_traverse_tagged_databases_graph(tagged_fixture):
                 {
                     "amount": 4,
                     "biosphere": [
-                        {"amount": 44, "impact": 132, "tag": "B", "secondary_tags": []}
+                        {
+                            "activity": get_activity(("biosphere", "worse")),
+                            "amount": 44,
+                            "impact": 132,
+                            "tag": "B",
+                            "secondary_tags": [],
+                        }
                     ],
                     "activity": get_activity(("foreground", "iv")),
                     "technosphere": [],
@@ -393,8 +414,20 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
                 {
                     "amount": 1,
                     "biosphere": [
-                        {"amount": 5, "impact": 10, "tag": "C", "secondary_tags": []},
-                        {"amount": 6, "impact": 18, "tag": "A", "secondary_tags": []},
+                        {
+                            "activity": get_activity(("biosphere", "bad")),
+                            "amount": 5,
+                            "impact": 10,
+                            "tag": "C",
+                            "secondary_tags": [],
+                        },
+                        {
+                            "activity": get_activity(("biosphere", "worse")),
+                            "amount": 6,
+                            "impact": 18,
+                            "tag": "A",
+                            "secondary_tags": [],
+                        },
                     ],
                     "activity": get_activity(("foreground", "i")),
                     "technosphere": [
@@ -402,12 +435,14 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16 / 3,
                                     "impact": 32 / 3,
                                     "tag": "C",
                                     "secondary_tags": [],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14 / 3,
                                     "impact": 42 / 3,
                                     "tag": "D",
@@ -424,6 +459,7 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": 54,
                                     "tag": "A",
@@ -445,6 +481,7 @@ def test_traverse_tagged_databases_graph_nonunitary_production():
                     "amount": 4,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": pytest.approx(44 / 10),
                             "impact": pytest.approx(132 / 10),
                             "tag": "B",
@@ -499,12 +536,14 @@ def test_multi_traverse_tagged_databases_graph(tagged_fixture):
                     "amount": 1,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "bad")),
                             "amount": 5,
                             "impact": [10, 10],
                             "tag": "C",
                             "secondary_tags": [],
                         },
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 6,
                             "impact": [18, 18],
                             "tag": "A",
@@ -517,12 +556,14 @@ def test_multi_traverse_tagged_databases_graph(tagged_fixture):
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16,
                                     "impact": [32, 32],
                                     "tag": "C",
                                     "secondary_tags": [],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14,
                                     "impact": [42, 42],
                                     "tag": "D",
@@ -539,6 +580,7 @@ def test_multi_traverse_tagged_databases_graph(tagged_fixture):
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": [54, 54],
                                     "tag": "A",
@@ -560,6 +602,7 @@ def test_multi_traverse_tagged_databases_graph(tagged_fixture):
                     "amount": 4,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 44,
                             "impact": [132, 132],
                             "tag": "B",
@@ -599,12 +642,14 @@ def test_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                     "amount": 1,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "bad")),
                             "amount": 5,
                             "impact": 10,
                             "tag": "C",
                             "secondary_tags": ["X"],
                         },
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 6,
                             "impact": 18,
                             "tag": "A",
@@ -617,12 +662,14 @@ def test_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16,
                                     "impact": 32,
                                     "tag": "C",
                                     "secondary_tags": ["X"],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14,
                                     "impact": 42,
                                     "tag": "D",
@@ -639,6 +686,7 @@ def test_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": 54,
                                     "tag": "A",
@@ -660,6 +708,7 @@ def test_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                     "amount": 4,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 44,
                             "impact": 132,
                             "tag": "B",
@@ -699,12 +748,14 @@ def test_multi_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                     "amount": 1,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "bad")),
                             "amount": 5,
                             "impact": [10, 10],
                             "tag": "C",
                             "secondary_tags": ["X"],
                         },
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 6,
                             "impact": [18, 18],
                             "tag": "A",
@@ -717,12 +768,14 @@ def test_multi_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16,
                                     "impact": [32, 32],
                                     "tag": "C",
                                     "secondary_tags": ["X"],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14,
                                     "impact": [42, 42],
                                     "tag": "D",
@@ -739,6 +792,7 @@ def test_multi_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": [54, 54],
                                     "tag": "A",
@@ -760,6 +814,7 @@ def test_multi_traverse_tagged_databases_graph_secondary_tag(tagged_fixture):
                     "amount": 4,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 44,
                             "impact": [132, 132],
                             "tag": "B",
@@ -797,8 +852,20 @@ def test_get_cum_impact(tagged_fixture):
                 {
                     "amount": 1,
                     "biosphere": [
-                        {"amount": 5, "impact": 10, "tag": "C", "secondary_tags": []},
-                        {"amount": 6, "impact": 18, "tag": "A", "secondary_tags": []},
+                        {
+                            "activity": get_activity(("biosphere", "bad")),
+                            "amount": 5,
+                            "impact": 10,
+                            "tag": "C",
+                            "secondary_tags": [],
+                        },
+                        {
+                            "activity": get_activity(("biosphere", "worse")),
+                            "amount": 6,
+                            "impact": 18,
+                            "tag": "A",
+                            "secondary_tags": [],
+                        },
                     ],
                     "activity": get_activity(("foreground", "i")),
                     "technosphere": [
@@ -806,12 +873,14 @@ def test_get_cum_impact(tagged_fixture):
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16,
                                     "impact": 32,
                                     "tag": "C",
                                     "secondary_tags": [],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14,
                                     "impact": 42,
                                     "tag": "D",
@@ -829,6 +898,7 @@ def test_get_cum_impact(tagged_fixture):
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": 54,
                                     "tag": "A",
@@ -851,7 +921,13 @@ def test_get_cum_impact(tagged_fixture):
                 {
                     "amount": 4,
                     "biosphere": [
-                        {"amount": 44, "impact": 132, "tag": "B", "secondary_tags": []}
+                        {
+                            "activity": get_activity(("biosphere", "worse")),
+                            "amount": 44,
+                            "impact": 132,
+                            "tag": "B",
+                            "secondary_tags": [],
+                        }
                     ],
                     "activity": get_activity(("foreground", "iv")),
                     "technosphere": [],
@@ -890,12 +966,14 @@ def test_get_multi_cum_impact(tagged_fixture):
                     "amount": 1,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "bad")),
                             "amount": 5,
                             "impact": [10, 10],
                             "tag": "C",
                             "secondary_tags": [],
                         },
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 6,
                             "impact": [18, 18],
                             "tag": "A",
@@ -908,12 +986,14 @@ def test_get_multi_cum_impact(tagged_fixture):
                             "amount": 2,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 16,
                                     "impact": [32, 32],
                                     "tag": "C",
                                     "secondary_tags": [],
                                 },
                                 {
+                                    "activity": get_activity(("biosphere", "worse")),
                                     "amount": 14,
                                     "impact": [42, 42],
                                     "tag": "D",
@@ -931,6 +1011,7 @@ def test_get_multi_cum_impact(tagged_fixture):
                             "amount": 3,
                             "biosphere": [
                                 {
+                                    "activity": get_activity(("biosphere", "bad")),
                                     "amount": 27,
                                     "impact": [54, 54],
                                     "tag": "A",
@@ -954,6 +1035,7 @@ def test_get_multi_cum_impact(tagged_fixture):
                     "amount": 4,
                     "biosphere": [
                         {
+                            "activity": get_activity(("biosphere", "worse")),
                             "amount": 44,
                             "impact": [132, 132],
                             "tag": "B",

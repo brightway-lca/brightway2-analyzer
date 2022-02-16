@@ -35,6 +35,21 @@ class ContributionTestCase(unittest.TestCase):
                 answer, ca.sort_array(test_data, limit=0.3, limit_type="percent")
             )
         )
+        
+    def test_sort_array_percentage_negative(self):
+        test_data = np.array((1.0, 2.0, -4.0, 3.0))
+        answer = np.array(
+            (
+                (-4, 2),
+                (3, 3),
+            )
+        )
+        ca = CA()
+        self.assertTrue(
+            np.allclose(
+                answer, ca.sort_array(test_data, limit=0.3, limit_type="percent")
+            )
+        )
 
     def test_sort_array_errors(self):
         ca = CA()

@@ -41,7 +41,7 @@ class ContributionAnalysis:
         if limit_type == "percent":
             if not 0 < limit <= 1:
                 raise ValueError("Percentage limits > 0 and <= 1.")
-            limit = (data >= (total * limit)).sum()
+            limit = (np.abs(data) >= (total * limit)).sum()
 
         results = np.hstack(
             (data.reshape((-1, 1)), np.arange(data.shape[0]).reshape((-1, 1)))

@@ -2,7 +2,7 @@ import copy
 import itertools
 from heapq import heappop, heappush
 
-from bw2data import Database, config, get_activity
+from bw2data import config, get_activity
 
 
 def tupify(o):

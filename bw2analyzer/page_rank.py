@@ -1,5 +1,4 @@
 from bw2calc import LCA
-from bw2data import Database
 from numpy import absolute, array, dot, ones, where
 
 

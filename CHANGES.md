@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.11.2 (2022-04-01)
+
+* [PR #19: Fixed negative contributions](https://github.com/brightway-lca/brightway2-analyzer/pull/19). Thanks @nabilahmed739.
+* [PR #12: Add helper function to label life cycle inventory](https://github.com/brightway-lca/brightway2-analyzer/pull/12). Thanks @BenPortner.
+* [PR #11: Add biosphere activity information to `multi_recurse_tagged_database`](https://github.com/brightway-lca/brightway2-analyzer/pull/11). Thanks Thanks @BenPortner.
+* [PR #10: Include biosphere activity information in tagged graph traversal ](https://github.com/brightway-lca/brightway2-analyzer/pull/10). Thanks @BenPortner.
+
 ## 0.11.1 (2021-10-24)
 
 * Fix bug in [non-unitary production amounts for recursive calculations](https://github.com/brightway-lca/from-the-ground-up/issues/1)

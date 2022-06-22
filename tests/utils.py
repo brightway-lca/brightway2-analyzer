@@ -1,10 +1,17 @@
-from .fixtures import recursive_fixture, method_fixture
-from bw2analyzer.utils import print_recursive_calculation, print_recursive_supply_chain
-from bw2data.tests import bw2test
-import bw2data as bd
-import bw2calc as bc
 import io
+
+import bw2calc as bc
+import bw2data as bd
 import pytest
+from bw2data.tests import bw2test
+
+from bw2analyzer.utils import (
+    print_recursive_calculation,
+    print_recursive_supply_chain,
+    recursive_calculation_to_object,
+)
+
+from .fixtures import method_fixture, recursive_fixture
 
 
 @bw2test
@@ -23,7 +30,7 @@ def test_print_recursive_calculation_nonunitary_production(capsys):
                 "location": "GLO",
                 "exchanges": [
                     {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
-                ]
+                ],
             },
         }
     )
@@ -48,13 +55,13 @@ def test_print_recursive_calculation_nonunitary_production_losses(capsys):
                     {"input": ("f", "1"), "amount": 3, "type": "production"},
                     {"input": ("f", "1"), "amount": 1, "type": "technosphere"},
                     {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
-                ]
+                ],
             },
             ("f", "2"): {
                 "location": "GLO",
                 "exchanges": [
                     {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
-                ]
+                ],
             },
         }
     )
@@ -79,13 +86,13 @@ def test_print_recursive_calculation_nonunitary_production_multiple_production(c
                     {"input": ("f", "1"), "amount": 1, "type": "production"},
                     {"input": ("f", "1"), "amount": 1, "type": "production"},
                     {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
-                ]
+                ],
             },
             ("f", "2"): {
                 "location": "GLO",
                 "exchanges": [
                     {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
-                ]
+                ],
             },
         }
     )
@@ -235,13 +242,13 @@ def test_print_recursive_supply_chain_nonunitary_production(capsys):
                 "exchanges": [
                     {"input": ("f", "1"), "amount": 2, "type": "production"},
                     {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
-                ]
+                ],
             },
             ("f", "2"): {
                 "location": "GLO",
                 "exchanges": [
                     {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
-                ]
+                ],
             },
         }
     )
@@ -264,13 +271,13 @@ def test_print_recursive_supply_chain_nonunitary_production_losses(capsys):
                     {"input": ("f", "1"), "amount": 3, "type": "production"},
                     {"input": ("f", "1"), "amount": 1, "type": "technosphere"},
                     {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
-                ]
+                ],
             },
             ("f", "2"): {
                 "location": "GLO",
                 "exchanges": [
                     {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
-                ]
+                ],
             },
         }
     )
@@ -293,13 +300,13 @@ def test_print_recursive_supply_chain_nonunitary_production_multiple_production(
                     {"input": ("f", "1"), "amount": 1, "type": "production"},
                     {"input": ("f", "1"), "amount": 1, "type": "production"},
                     {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
-                ]
+                ],
             },
             ("f", "2"): {
                 "location": "GLO",
                 "exchanges": [
                     {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
-                ]
+                ],
             },
         }
     )
@@ -310,3 +317,285 @@ def test_print_recursive_supply_chain_nonunitary_production_multiple_production(
     expected = """1: Activity with missing fields (call ``valid(why=True)`` to see more)
 """
     assert capsys.readouterr().out == expected
+
+
+@pytest.fixture
+@bw2test
+def rcto_fixture():
+    bd.Database("f").write(
+        {
+            ("f", "b"): {"exchanges": [], "type": "emission", "location": "GLO"},
+            ("f", "1"): {
+                "exchanges": [
+                    {"input": ("f", "2"), "amount": 1, "type": "technosphere"},
+                ],
+                "location": "GLO",
+            },
+            ("f", "2"): {
+                "location": "GLO",
+                "name": "foo",
+                "exchanges": [
+                    {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
+                    {"input": ("f", "1"), "amount": 0.8, "type": "technosphere"},
+                ],
+            },
+        }
+    )
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+
+def test_recursive_calculation_to_object_deep_recursion(rcto_fixture):
+    expected = [
+        {
+            "label": "root",
+            "parent": None,
+            "score": 5.000000298023242,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a",
+            "parent": "root",
+            "score": 5.000000298023242,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+        {
+            "label": "root_a_a",
+            "parent": "root_a",
+            "score": 4.000000238418593,
+            "fraction": 0.8,
+            "amount": 0.8,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a_a_a",
+            "parent": "root_a_a",
+            "score": 4.000000238418593,
+            "fraction": 0.8,
+            "amount": 0.8,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+        {
+            "label": "root_a_a_a_a",
+            "parent": "root_a_a_a",
+            "score": 3.200000190734875,
+            "fraction": 0.6400000000000001,
+            "amount": 0.6400000000000001,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a_a_a_a_a",
+            "parent": "root_a_a_a_a",
+            "score": 3.200000190734875,
+            "fraction": 0.6400000000000001,
+            "amount": 0.6400000000000001,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+        {
+            "label": "root_a_a_a_a_a_a",
+            "parent": "root_a_a_a_a_a",
+            "score": 2.5600001525879,
+            "fraction": 0.5120000000000001,
+            "amount": 0.5120000000000001,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a_a_a_a_a_a_a",
+            "parent": "root_a_a_a_a_a_a",
+            "score": 2.5600001525879,
+            "fraction": 0.5120000000000001,
+            "amount": 0.5120000000000001,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+        {
+            "label": "root_a_a_a_a_a_a_a_a",
+            "parent": "root_a_a_a_a_a_a_a",
+            "score": 2.0480001220703206,
+            "fraction": 0.40960000000000013,
+            "amount": 0.40960000000000013,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a_a_a_a_a_a_a_a_a",
+            "parent": "root_a_a_a_a_a_a_a_a",
+            "score": 2.0480001220703206,
+            "fraction": 0.40960000000000013,
+            "amount": 0.40960000000000013,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+        {
+            "label": "root_a_a_a_a_a_a_a_a_a_a",
+            "parent": "root_a_a_a_a_a_a_a_a_a",
+            "score": 1.6384000976562565,
+            "fraction": 0.32768000000000014,
+            "amount": 0.32768000000000014,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+    ]
+    assert recursive_calculation_to_object(("f", "1"), ("m",), max_level=10) == expected
+
+
+@pytest.fixture
+@bw2test
+def rcto_fixture_2():
+    bd.Database("f").write(
+        {
+            ("f", "b"): {"exchanges": [], "type": "emission", "location": "GLO"},
+            ("f", "1"): {
+                "exchanges": [
+                    {"input": ("f", "1"), "amount": 2, "type": "production"},
+                    {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
+                ],
+                "location": "GLO",
+            },
+            ("f", "2"): {
+                "location": "GLO",
+                "name": "foo",
+                "exchanges": [
+                    {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
+                ],
+            },
+        }
+    )
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+
+def test_recursive_calculation_to_object_custom_prefix(rcto_fixture_2):
+    expected = [
+        {
+            "label": "foo",
+            "parent": None,
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "foo_a",
+            "parent": "foo",
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+    ]
+    assert (
+        recursive_calculation_to_object(("f", "1"), ("m",), root_label="foo")
+        == expected
+    )
+
+
+def test_recursive_calculation_to_object_nonunitary_production(rcto_fixture_2):
+    expected = [
+        {
+            "label": "root",
+            "parent": None,
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a",
+            "parent": "root",
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+    ]
+    assert recursive_calculation_to_object(("f", "1"), ("m",)) == expected
+
+
+@bw2test
+def test_recursive_calculation_to_object_nonunitary_production_losses(capsys):
+    bd.Database("f").write(
+        {
+            ("f", "b"): {"exchanges": [], "type": "emission", "location": "GLO"},
+            ("f", "1"): {
+                "location": "GLO",
+                "exchanges": [
+                    {"input": ("f", "1"), "amount": 3, "type": "production"},
+                    {"input": ("f", "1"), "amount": 1, "type": "technosphere"},
+                    {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
+                ],
+            },
+            ("f", "2"): {
+                "location": "GLO",
+                "exchanges": [
+                    {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
+                ],
+            },
+        }
+    )
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+    expected = [
+        {
+            "label": "root",
+            "parent": None,
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_b",
+            "parent": "root",
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "2"),
+        },
+    ]
+    assert recursive_calculation_to_object(("f", "1"), ("m",)) == expected
+
+
+@bw2test
+def test_recursive_calculation_to_object_nonunitary_production_multiple_production(
+    capsys,
+):
+    bd.Database("f").write(
+        {
+            ("f", "b"): {"exchanges": [], "type": "emission", "location": "GLO"},
+            ("f", "1"): {
+                "location": "GLO",
+                "exchanges": [
+                    {"input": ("f", "1"), "amount": 1, "type": "production"},
+                    {"input": ("f", "1"), "amount": 1, "type": "production"},
+                    {"input": ("f", "2"), "amount": 2, "type": "technosphere"},
+                ],
+            },
+            ("f", "2"): {
+                "location": "GLO",
+                "exchanges": [
+                    {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
+                ],
+            },
+        }
+    )
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+
+    with pytest.warns(UserWarning, match="Hit multiple production exchanges"):
+        result = recursive_calculation_to_object(("f", "1"), ("m",))
+    assert result is None

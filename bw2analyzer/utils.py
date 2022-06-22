@@ -90,10 +90,10 @@ def print_recursive_calculation(
     cutoff=1e-2,
     file_obj=None,
     tab_character="  ",
-    level=0,
-    lca_obj=None,
-    total_score=None,
-    first=True,
+    __level=0,
+    __lca_obj=None,
+    __total_score=None,
+    __first=True,
 ):
     """Traverse a supply chain graph, and calculate the LCA scores of each component. Prints the result with the format:
 
@@ -109,10 +109,10 @@ def print_recursive_calculation(
         tab_character: str. Character to use to indicate indentation.
 
     Internal args (used during recursion, do not touch);
-        level: int.
-        lca_obj: ``LCA``.
-        total_score: float.
-        first: bool.
+        __level: int.
+        __lca_obj: ``LCA``.
+        __total_score: float.
+        __first: bool.
 
     Returns:
         Nothing. Prints to ``sys.stdout`` or ``file_obj``
@@ -122,28 +122,28 @@ def print_recursive_calculation(
     if file_obj is None:
         file_obj = sys.stdout
 
-    if lca_obj is None:
-        lca_obj = bc.LCA({activity: amount}, lcia_method)
-        lca_obj.lci()
-        lca_obj.lcia()
-        total_score = lca_obj.score
-    elif total_score is None:
+    if __lca_obj is None:
+        __lca_obj = bc.LCA({activity: amount}, lcia_method)
+        __lca_obj.lci()
+        __lca_obj.lcia()
+        __total_score = __lca_obj.score
+    elif __total_score is None:
         raise ValueError
     else:
-        lca_obj.redo_lcia({activity.id: amount})
-        if abs(lca_obj.score) <= abs(total_score * cutoff):
+        __lca_obj.redo_lcia({activity.id: amount})
+        if abs(__lca_obj.score) <= abs(__total_score * cutoff):
             return
-    if first:
+    if __first:
         file_obj.write("Fraction of score | Absolute score | Amount | Activity\n")
     message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(
-        tab_character * level,
-        lca_obj.score / total_score,
-        lca_obj.score,
+        tab_character * __level,
+        __lca_obj.score / __total_score,
+        __lca_obj.score,
         float(amount),
         str(activity),
     )
     file_obj.write(message + "\n")
-    if level < max_level:
+    if __level < max_level:
         prod_exchanges = list(activity.production())
         if not prod_exchanges:
             prod_amount = 1
@@ -151,9 +151,9 @@ def print_recursive_calculation(
             warn("Hit multiple production exchanges; aborting in this branch")
             return
         else:
-            prod_amount = lca_obj.technosphere_matrix[
-                lca_obj.dicts.product[prod_exchanges[0].input.id],
-                lca_obj.dicts.activity[prod_exchanges[0].output.id],
+            prod_amount = __lca_obj.technosphere_matrix[
+                __lca_obj.dicts.product[prod_exchanges[0].input.id],
+                __lca_obj.dicts.activity[prod_exchanges[0].output.id],
             ]
 
         for exc in activity.technosphere():
@@ -165,12 +165,12 @@ def print_recursive_calculation(
                 amount=amount * exc["amount"] / prod_amount,
                 max_level=max_level,
                 cutoff=cutoff,
-                first=False,
                 file_obj=file_obj,
                 tab_character=tab_character,
-                lca_obj=lca_obj,
-                total_score=total_score,
-                level=level + 1,
+                __first=False,
+                __lca_obj=__lca_obj,
+                __total_score=__total_score,
+                __level=__level + 1,
             )
 
 
@@ -181,7 +181,7 @@ def print_recursive_supply_chain(
     cutoff=0,
     file_obj=None,
     tab_character="  ",
-    level=0,
+    __level=0,
 ):
     """Traverse a supply chain graph, and prints the inputs of each component.
 
@@ -196,7 +196,7 @@ def print_recursive_supply_chain(
         cutoff: float. Inputs with amounts less than ``amount * cutoff`` will not be printed or traversed further.
         file_obj: File-like object (supports ``.write``), optional. Output will be written to this object if provided.
         tab_character: str. Character to use to indicate indentation.
-        level: int. Current level of the calculation. Only used internally, do not touch.
+        __level: int. Current level of the calculation. Only used internally, do not touch.
 
     Returns:
         Nothing. Prints to ``stdout`` or ``file_obj``
@@ -208,9 +208,9 @@ def print_recursive_supply_chain(
 
     if cutoff > 0 and amount < cutoff:
         return
-    message = "{}{:.3g}: {:.70}".format(tab_character * level, amount, str(activity))
+    message = "{}{:.3g}: {:.70}".format(tab_character * __level, amount, str(activity))
     file_obj.write(message + "\n")
-    if level < max_level:
+    if __level < max_level:
         prod_exchanges = list(activity.production())
         if not prod_exchanges:
             prod_amount = 1
@@ -229,9 +229,9 @@ def print_recursive_supply_chain(
             print_recursive_supply_chain(
                 activity=exc.input,
                 amount=amount * exc["amount"] / prod_amount,
-                level=level + 1,
                 max_level=max_level,
                 cutoff=cutoff,
                 file_obj=file_obj,
                 tab_character=tab_character,
+                __level=__level + 1,
             )

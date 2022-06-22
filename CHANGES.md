@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.3 (2022-06-22)
+
+* Add `recursive_calculation_to_object` function which returns lists or pandas DataFrames.
+
 ## 0.11.2 (2022-04-01)
 
 * [PR #19: Fixed negative contributions](https://github.com/brightway-lca/brightway2-analyzer/pull/19). Thanks @nabilahmed739.

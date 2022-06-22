@@ -1,8 +1,11 @@
+import itertools
+import string
 import sys
 from warnings import warn
 
 import bw2calc as bc
 import numpy as np
+import pandas as pd
 import pyprind
 from bw2data import Database, databases, get_activity, methods
 
@@ -235,3 +238,126 @@ def print_recursive_supply_chain(
                 tab_character=tab_character,
                 __level=__level + 1,
             )
+
+
+def infinite_alphabet():
+    """Return generator with values a-z, then aa-az, ba-bz, then aaa-aaz, aba-abz, etc."""
+    for value in itertools.chain.from_iterable(
+        itertools.product(string.ascii_lowercase, repeat=i) for i in itertools.count(1)
+    ):
+        yield "".join(value)
+
+
+def recursive_calculation_to_object(
+    activity,
+    lcia_method,
+    amount=1,
+    max_level=3,
+    cutoff=1e-2,
+    as_dataframe=False,
+    root_label="root",
+    __result_list=None,
+    __level=0,
+    __label="",
+    __parent=None,
+    __lca_obj=None,
+    __total_score=None,
+):
+    """Traverse a supply chain graph, and calculate the LCA scores of each component. Adds a dictionary to ``result_list`` of the form:
+
+        {
+            'label': Label of this branch. Starts with nothing, then A, AA, AB, AAA, AAB, etc.
+            'score': Absolute score of this activity
+            'fraction': Fraction of total score of this activity
+            'amount': Input amount of the reference product of this activity
+            'name': Name of this activity
+            'key': Activity key
+            'root_label': Starting label of root element for recursion.
+        }
+
+    Args:
+        activity: ``Activity``. The starting point of the supply chain graph.
+        lcia_method: tuple. LCIA method to use when traversing supply chain graph.
+        amount: int. Amount of ``activity`` to assess.
+        max_level: int. Maximum depth to traverse.
+        cutoff: float. Fraction of total score to use as cutoff when deciding whether to traverse deeper.
+        as_dataframe: Return results as a list (default) or a pandas ``DataFrame``
+
+    Internal args (used during recursion, do not touch):
+        __result_list: list.
+        __level: int.
+        __label: str.
+        __parent: str.
+        __lca_obj: ``LCA``.
+        __total_score: float.
+
+    Returns:
+        List of dicts
+
+    """
+    activity = get_activity(activity)
+    if __result_list is None:
+        __result_list = []
+        __label = root_label
+
+    if __lca_obj is None:
+        __lca_obj = bc.LCA({activity: amount}, lcia_method)
+        __lca_obj.lci()
+        __lca_obj.lcia()
+        __total_score = __lca_obj.score
+    elif __total_score is None:
+        raise ValueError
+    else:
+        __lca_obj.redo_lcia({activity.id: amount})
+        if abs(__lca_obj.score) <= abs(__total_score * cutoff):
+            return
+    __result_list.append(
+        {
+            "label": __label,
+            "parent": __parent,
+            "score": __lca_obj.score,
+            "fraction": __lca_obj.score / __total_score,
+            "amount": float(amount),
+            "name": activity.get("name", "(Unknown name)"),
+            "key": activity.key,
+        }
+    )
+    if __level < max_level:
+        prod_exchanges = list(activity.production())
+        if not prod_exchanges:
+            prod_amount = 1
+        elif len(prod_exchanges) > 1:
+            warn(
+                "Hit multiple production exchanges for {}; aborting in this branch".format(
+                    activity
+                )
+            )
+            return
+        else:
+            prod_amount = __lca_obj.technosphere_matrix[
+                __lca_obj.dicts.product[prod_exchanges[0].input.id],
+                __lca_obj.dicts.activity[prod_exchanges[0].output.id],
+            ]
+
+        for child_label, exc in zip(infinite_alphabet(), activity.technosphere()):
+            if exc.input.id == exc.output.id:
+                continue
+            recursive_calculation_to_object(
+                activity=exc.input,
+                lcia_method=lcia_method,
+                amount=amount * exc["amount"] / prod_amount,
+                max_level=max_level,
+                cutoff=cutoff,
+                as_dataframe=as_dataframe,
+                __result_list=__result_list,
+                __parent=__label,
+                __label=__label + "_" + child_label if __label else child_label,
+                __lca_obj=__lca_obj,
+                __total_score=__total_score,
+                __level=__level + 1,
+            )
+
+    if as_dataframe and __label == root_label:
+        return pd.DataFrame(__result_list)
+    else:
+        return __result_list

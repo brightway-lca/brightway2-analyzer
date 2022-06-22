@@ -1,4 +1,5 @@
 import io
+import pandas as pd
 
 import bw2calc as bc
 import bw2data as bd
@@ -342,6 +343,12 @@ def rcto_fixture():
         }
     )
     bd.Method(("m",)).write([(("f", "b"), 1)])
+
+
+def test_recursive_calculation_to_object_return_dataframe(rcto_fixture):
+    df = recursive_calculation_to_object(("f", "1"), ("m",), max_level=10, as_dataframe=True)
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == 11
 
 
 def test_recursive_calculation_to_object_deep_recursion(rcto_fixture):

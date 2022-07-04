@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.4 (2022-07-04)
+
+* Add `use_matrix_values` to `recursive_calculation_to_object` and `print_recursive_calculation` for Monte Carlo
+* Add passing custom LCA classes to `recursive_calculation_to_object` and `print_recursive_calculation` for Monte Carlo and regionalized LCA
+
 ## 0.11.3 (2022-06-22)
 
 * Add `recursive_calculation_to_object` function which returns lists or pandas DataFrames.

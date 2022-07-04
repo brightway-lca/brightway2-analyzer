@@ -93,9 +93,10 @@ def print_recursive_calculation(
     cutoff=1e-2,
     file_obj=None,
     tab_character="  ",
+    use_matrix_values=False,
+    _lca_obj=None,
+    _total_score=None,
     __level=0,
-    __lca_obj=None,
-    __total_score=None,
     __first=True,
 ):
     """Traverse a supply chain graph, and calculate the LCA scores of each component. Prints the result with the format:
@@ -110,11 +111,14 @@ def print_recursive_calculation(
         cutoff: float. Fraction of total score to use as cutoff when deciding whether to traverse deeper.
         file_obj: File-like object (supports ``.write``), optional. Output will be written to this object if provided.
         tab_character: str. Character to use to indicate indentation.
+        use_matrix_values: bool. Take exchange values from the matrix instead of the exchange instance ``amount``. Useful for Monte Carlo, but can be incorrect if there is more than one exchange from the same pair of nodes.
+
+    Normally internal args:
+        _lca_obj: ``LCA``. Can give an instance of the LCA class (e.g. when doing regionalized or Monte Carlo LCA)
+        _total_score: float. Needed if specifying ``_lca_obj``.
 
     Internal args (used during recursion, do not touch);
         __level: int.
-        __lca_obj: ``LCA``.
-        __total_score: float.
         __first: bool.
 
     Returns:
@@ -125,23 +129,23 @@ def print_recursive_calculation(
     if file_obj is None:
         file_obj = sys.stdout
 
-    if __lca_obj is None:
-        __lca_obj = bc.LCA({activity: amount}, lcia_method)
-        __lca_obj.lci()
-        __lca_obj.lcia()
-        __total_score = __lca_obj.score
-    elif __total_score is None:
+    if _lca_obj is None:
+        _lca_obj = bc.LCA({activity: amount}, lcia_method)
+        _lca_obj.lci()
+        _lca_obj.lcia()
+        _total_score = _lca_obj.score
+    elif _total_score is None:
         raise ValueError
     else:
-        __lca_obj.redo_lcia({activity.id: amount})
-        if abs(__lca_obj.score) <= abs(__total_score * cutoff):
+        _lca_obj.redo_lcia({activity.id: amount})
+        if abs(_lca_obj.score) <= abs(_total_score * cutoff):
             return
     if __first:
         file_obj.write("Fraction of score | Absolute score | Amount | Activity\n")
     message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(
         tab_character * __level,
-        __lca_obj.score / __total_score,
-        __lca_obj.score,
+        _lca_obj.score / _total_score,
+        _lca_obj.score,
         float(amount),
         str(activity),
     )
@@ -154,25 +158,42 @@ def print_recursive_calculation(
             warn("Hit multiple production exchanges; aborting in this branch")
             return
         else:
-            prod_amount = __lca_obj.technosphere_matrix[
-                __lca_obj.dicts.product[prod_exchanges[0].input.id],
-                __lca_obj.dicts.activity[prod_exchanges[0].output.id],
+            prod_amount = _lca_obj.technosphere_matrix[
+                _lca_obj.dicts.product[prod_exchanges[0].input.id],
+                _lca_obj.dicts.activity[prod_exchanges[0].output.id],
             ]
 
         for exc in activity.technosphere():
             if exc.input.id == exc.output.id:
                 continue
+
+            if use_matrix_values:
+                sign = (
+                    -1
+                    if exc.get("type") in ("technosphere", "generic technosphere")
+                    else 1
+                )
+                tm_amount = (
+                    _lca_obj.technosphere_matrix[
+                        _lca_obj.dicts.product[exc.input.id],
+                        _lca_obj.dicts.activity[exc.output.id],
+                    ]
+                    * sign
+                )
+            else:
+                tm_amount = exc["amount"]
+
             print_recursive_calculation(
                 activity=exc.input,
                 lcia_method=lcia_method,
-                amount=amount * exc["amount"] / prod_amount,
+                amount=amount * tm_amount / prod_amount,
                 max_level=max_level,
                 cutoff=cutoff,
                 file_obj=file_obj,
                 tab_character=tab_character,
                 __first=False,
-                __lca_obj=__lca_obj,
-                __total_score=__total_score,
+                _lca_obj=_lca_obj,
+                _total_score=_total_score,
                 __level=__level + 1,
             )
 
@@ -256,12 +277,13 @@ def recursive_calculation_to_object(
     cutoff=1e-2,
     as_dataframe=False,
     root_label="root",
+    use_matrix_values=False,
+    _lca_obj=None,
+    _total_score=None,
     __result_list=None,
     __level=0,
     __label="",
     __parent=None,
-    __lca_obj=None,
-    __total_score=None,
 ):
     """Traverse a supply chain graph, and calculate the LCA scores of each component. Adds a dictionary to ``result_list`` of the form:
 
@@ -282,14 +304,13 @@ def recursive_calculation_to_object(
         max_level: int. Maximum depth to traverse.
         cutoff: float. Fraction of total score to use as cutoff when deciding whether to traverse deeper.
         as_dataframe: Return results as a list (default) or a pandas ``DataFrame``
+        use_matrix_values: bool. Take exchange values from the matrix instead of the exchange instance ``amount``. Useful for Monte Carlo, but can be incorrect if there is more than one exchange from the same pair of nodes.
 
     Internal args (used during recursion, do not touch):
         __result_list: list.
         __level: int.
         __label: str.
         __parent: str.
-        __lca_obj: ``LCA``.
-        __total_score: float.
 
     Returns:
         List of dicts
@@ -300,23 +321,23 @@ def recursive_calculation_to_object(
         __result_list = []
         __label = root_label
 
-    if __lca_obj is None:
-        __lca_obj = bc.LCA({activity: amount}, lcia_method)
-        __lca_obj.lci()
-        __lca_obj.lcia()
-        __total_score = __lca_obj.score
-    elif __total_score is None:
+    if _lca_obj is None:
+        _lca_obj = bc.LCA({activity: amount}, lcia_method)
+        _lca_obj.lci()
+        _lca_obj.lcia()
+        _total_score = _lca_obj.score
+    elif _total_score is None:
         raise ValueError
     else:
-        __lca_obj.redo_lcia({activity.id: amount})
-        if abs(__lca_obj.score) <= abs(__total_score * cutoff):
+        _lca_obj.redo_lcia({activity.id: amount})
+        if abs(_lca_obj.score) <= abs(_total_score * cutoff):
             return
     __result_list.append(
         {
             "label": __label,
             "parent": __parent,
-            "score": __lca_obj.score,
-            "fraction": __lca_obj.score / __total_score,
+            "score": _lca_obj.score,
+            "fraction": _lca_obj.score / _total_score,
             "amount": float(amount),
             "name": activity.get("name", "(Unknown name)"),
             "key": activity.key,
@@ -334,26 +355,43 @@ def recursive_calculation_to_object(
             )
             return
         else:
-            prod_amount = __lca_obj.technosphere_matrix[
-                __lca_obj.dicts.product[prod_exchanges[0].input.id],
-                __lca_obj.dicts.activity[prod_exchanges[0].output.id],
+            prod_amount = _lca_obj.technosphere_matrix[
+                _lca_obj.dicts.product[prod_exchanges[0].input.id],
+                _lca_obj.dicts.activity[prod_exchanges[0].output.id],
             ]
 
         for child_label, exc in zip(infinite_alphabet(), activity.technosphere()):
             if exc.input.id == exc.output.id:
                 continue
+
+            if use_matrix_values:
+                sign = (
+                    -1
+                    if exc.get("type") in ("technosphere", "generic technosphere")
+                    else 1
+                )
+                tm_amount = (
+                    _lca_obj.technosphere_matrix[
+                        _lca_obj.dicts.product[exc.input.id],
+                        _lca_obj.dicts.activity[exc.output.id],
+                    ]
+                    * sign
+                )
+            else:
+                tm_amount = exc["amount"]
+
             recursive_calculation_to_object(
                 activity=exc.input,
                 lcia_method=lcia_method,
-                amount=amount * exc["amount"] / prod_amount,
+                amount=amount * tm_amount / prod_amount,
                 max_level=max_level,
                 cutoff=cutoff,
                 as_dataframe=as_dataframe,
                 __result_list=__result_list,
                 __parent=__label,
                 __label=__label + "_" + child_label if __label else child_label,
-                __lca_obj=__lca_obj,
-                __total_score=__total_score,
+                _lca_obj=_lca_obj,
+                _total_score=_total_score,
                 __level=__level + 1,
             )
 

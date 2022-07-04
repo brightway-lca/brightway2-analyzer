@@ -1,8 +1,8 @@
 import io
-import pandas as pd
 
 import bw2calc as bc
 import bw2data as bd
+import pandas as pd
 import pytest
 from bw2data.tests import bw2test
 
@@ -38,6 +38,85 @@ def test_print_recursive_calculation_nonunitary_production(capsys):
     bd.Method(("m",)).write([(("f", "b"), 1)])
 
     print_recursive_calculation(("f", "1"), ("m",))
+    expected = """Fraction of score | Absolute score | Amount | Activity
+0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+  0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
+
+
+@bw2test
+def test_print_recursive_calculation_nonunitary_production_custom_lca(capsys):
+    bd.Database("f").write(
+        {
+            ("f", "b"): {"exchanges": [], "type": "emission", "location": "GLO"},
+            ("f", "1"): {
+                "exchanges": [
+                    {"input": ("f", "1"), "amount": 1, "type": "production"},
+                ],
+                "location": "GLO",
+            },
+            ("f", "2"): {
+                "location": "GLO",
+                "exchanges": [
+                    {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
+                ],
+            },
+        }
+    )
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+    lca = bc.LCA({("f", "1"): 1}, ("m",))
+    lca.lci()
+    lca.lcia()
+
+    lca.technosphere_matrix[
+        lca.dicts.product[bd.get_activity(("f", "2")).id],
+        lca.dicts.product[bd.get_activity(("f", "1")).id],
+    ] = -1
+
+    # Despite a revised matrix, we only use saved exchange values, so don't ever hit ("f", "2")
+    print_recursive_calculation(("f", "1"), ("m",), _lca_obj=lca, _total_score=1)
+    expected = """Fraction of score | Absolute score | Amount | Activity
+0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
+"""
+    assert capsys.readouterr().out == expected
+
+
+@bw2test
+def test_print_recursive_calculation_nonunitary_production_custom_lca_use_matrix_values(
+    capsys,
+):
+    bd.Database("f").write(
+        {
+            ("f", "b"): {"exchanges": [], "type": "emission", "location": "GLO"},
+            ("f", "1"): {
+                "exchanges": [
+                    {"input": ("f", "1"), "amount": 1, "type": "production"},
+                    {"input": ("f", "2"), "amount": 100, "type": "technosphere"},
+                ],
+                "location": "GLO",
+            },
+            ("f", "2"): {
+                "location": "GLO",
+                "exchanges": [
+                    {"input": ("f", "b"), "amount": 1, "type": "biosphere"},
+                ],
+            },
+        }
+    )
+    bd.Method(("m",)).write([(("f", "b"), 1)])
+    lca = bc.LCA({("f", "1"): 1}, ("m",))
+    lca.lci()
+    lca.lcia()
+
+    lca.technosphere_matrix[
+        lca.dicts.product[bd.get_activity(("f", "2")).id],
+        lca.dicts.product[bd.get_activity(("f", "1")).id],
+    ] = -1
+
+    print_recursive_calculation(
+        ("f", "1"), ("m",), _lca_obj=lca, _total_score=1, use_matrix_values=True
+    )
     expected = """Fraction of score | Absolute score | Amount | Activity
 0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
   0001 |     1 |     1 | Activity with missing fields (call ``valid(why=True)`` to see more)
@@ -346,7 +425,9 @@ def rcto_fixture():
 
 
 def test_recursive_calculation_to_object_return_dataframe(rcto_fixture):
-    df = recursive_calculation_to_object(("f", "1"), ("m",), max_level=10, as_dataframe=True)
+    df = recursive_calculation_to_object(
+        ("f", "1"), ("m",), max_level=10, as_dataframe=True
+    )
     assert isinstance(df, pd.DataFrame)
     assert len(df) == 11
 
@@ -479,6 +560,74 @@ def rcto_fixture_2():
         }
     )
     bd.Method(("m",)).write([(("f", "b"), 1)])
+
+
+def test_recursive_calculation_to_object_use_matrix_values(rcto_fixture_2):
+    expected = [
+        {
+            "label": "root",
+            "parent": None,
+            "score": 2.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a",
+            "parent": "root",
+            "score": 1.0,
+            "fraction": 0.5,
+            "amount": 1.0,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+    ]
+    lca = bc.LCA({("f", "1"): 1}, ("m",))
+    lca.lci()
+    lca.lcia()
+    lca.biosphere_matrix[
+        lca.dicts.biosphere[bd.get_activity(("f", "b")).id],
+        lca.dicts.activity[bd.get_activity(("f", "1")).id],
+    ] = 2
+    assert (
+        recursive_calculation_to_object(
+            ("f", "1"), ("m",), _lca_obj=lca, _total_score=2, use_matrix_values=True
+        )
+        == expected
+    )
+
+
+def test_recursive_calculation_to_object_supply_lca(rcto_fixture_2):
+    expected = [
+        {
+            "label": "root",
+            "parent": None,
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "(Unknown name)",
+            "key": ("f", "1"),
+        },
+        {
+            "label": "root_a",
+            "parent": "root",
+            "score": 1.0,
+            "fraction": 1.0,
+            "amount": 1.0,
+            "name": "foo",
+            "key": ("f", "2"),
+        },
+    ]
+    lca = bc.LCA({("f", "1"): 1}, ("m",))
+    lca.lci()
+    lca.lcia()
+    assert (
+        recursive_calculation_to_object(
+            ("f", "1"), ("m",), _lca_obj=lca, _total_score=lca.score
+        )
+        == expected
+    )
 
 
 def test_recursive_calculation_to_object_custom_prefix(rcto_fixture_2):

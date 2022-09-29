@@ -47,7 +47,7 @@ def select_parameters_by_supply_chain_level(
     first=True,
     exchange_list=None):
     '''arguments:  
-         activity_list: activity
+         activity: activity
          max_level: maximum level of supply chain to be analyzed
        
          returns:

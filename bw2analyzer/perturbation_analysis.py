@@ -11,7 +11,7 @@ import pandas as pd
 import brightway2 as bw
 import presamples
 import time
-import plotly.express as px
+
 
 def select_parameters_by_activity_list(activity_list,exc_type='all'):
     '''arguments:
@@ -47,7 +47,7 @@ def select_parameters_by_supply_chain_level(
     first=True,
     exchange_list=None):
     '''arguments:  
-         activity_list: activity
+         activity: activity
          max_level: maximum level of supply chain to be analyzed
        
          returns:
@@ -398,6 +398,7 @@ def plot_sensitivity_ratios_plotly(sensitivity_ratio_df, LCIA_method_names):
        returns: nothing
            (A bar chart with sensitivity ratios per impact category is produced.
             The results are clustered in predefined categories.)'''
+    import plotly.express as px
     plotly_df=pd.DataFrame()
     ind=0
     for p in sensitivity_ratio_df.index:

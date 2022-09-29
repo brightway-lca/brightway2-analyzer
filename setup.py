@@ -25,6 +25,7 @@ setup(
         "scipy",
         "stats_arrays",
         "tabulate",
+        "presamples",
     ],
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

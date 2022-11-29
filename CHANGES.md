@@ -1,4 +1,4 @@
-# Changelog
+# analyzer Changelog
 
 ## 0.11.4 (2022-07-04)
 

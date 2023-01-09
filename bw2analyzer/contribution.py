@@ -151,7 +151,7 @@ class ContributionAnalysis:
 
         """
         results = [
-            (score, lca.inventory[index, :].sum(), lca.dicts.biosphere.reversed[index])
+            (score, lca.inventory[int(index), :].sum(), lca.dicts.biosphere.reversed[int(index)])
             for score, index in self.top_emissions(
                 lca.characterized_inventory, **kwargs
             )

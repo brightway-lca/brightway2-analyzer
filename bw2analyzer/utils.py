@@ -91,6 +91,7 @@ def print_recursive_calculation(
     amount=1,
     max_level=3,
     cutoff=1e-2,
+    string_length=130,
     file_obj=None,
     tab_character="  ",
     use_matrix_values=False,
@@ -109,6 +110,7 @@ def print_recursive_calculation(
         amount: int. Amount of ``activity`` to assess.
         max_level: int. Maximum depth to traverse.
         cutoff: float. Fraction of total score to use as cutoff when deciding whether to traverse deeper.
+        string_length: int. Maximum length of printed string.
         file_obj: File-like object (supports ``.write``), optional. Output will be written to this object if provided.
         tab_character: str. Character to use to indicate indentation.
         use_matrix_values: bool. Take exchange values from the matrix instead of the exchange instance ``amount``. Useful for Monte Carlo, but can be incorrect if there is more than one exchange from the same pair of nodes.
@@ -142,14 +144,14 @@ def print_recursive_calculation(
             return
     if __first:
         file_obj.write("Fraction of score | Absolute score | Amount | Activity\n")
-    message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(
+    message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {}".format(
         tab_character * __level,
         _lca_obj.score / _total_score,
         _lca_obj.score,
         float(amount),
         str(activity),
     )
-    file_obj.write(message + "\n")
+    file_obj.write(message[:string_length] + "\n")
     if __level < max_level:
         prod_exchanges = list(activity.production())
         if not prod_exchanges:
@@ -189,6 +191,7 @@ def print_recursive_calculation(
                 amount=amount * tm_amount / prod_amount,
                 max_level=max_level,
                 cutoff=cutoff,
+                string_length=string_length,
                 file_obj=file_obj,
                 tab_character=tab_character,
                 __first=False,
@@ -203,6 +206,7 @@ def print_recursive_supply_chain(
     amount=1,
     max_level=2,
     cutoff=0,
+    string_length=130,
     file_obj=None,
     tab_character="  ",
     __level=0,
@@ -218,6 +222,7 @@ def print_recursive_supply_chain(
         amount: int. Supply chain inputs will be scaled to this value.
         max_level: int. Max depth to search for.
         cutoff: float. Inputs with amounts less than ``amount * cutoff`` will not be printed or traversed further.
+        string_length: int. Maximum length of each line.
         file_obj: File-like object (supports ``.write``), optional. Output will be written to this object if provided.
         tab_character: str. Character to use to indicate indentation.
         __level: int. Current level of the calculation. Only used internally, do not touch.
@@ -232,8 +237,8 @@ def print_recursive_supply_chain(
 
     if cutoff > 0 and amount < cutoff:
         return
-    message = "{}{:.3g}: {:.70}".format(tab_character * __level, amount, str(activity))
-    file_obj.write(message + "\n")
+    message = "{}{:.3g}: {}".format(tab_character * __level, amount, str(activity))
+    file_obj.write(message[:string_length] + "\n")
     if __level < max_level:
         prod_exchanges = list(activity.production())
         if not prod_exchanges:
@@ -255,6 +260,7 @@ def print_recursive_supply_chain(
                 amount=amount * exc["amount"] / prod_amount,
                 max_level=max_level,
                 cutoff=cutoff,
+                string_length=string_length,
                 file_obj=file_obj,
                 tab_character=tab_character,
                 __level=__level + 1,

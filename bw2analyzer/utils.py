@@ -142,7 +142,7 @@ def print_recursive_calculation(
             return
     if __first:
         file_obj.write("Fraction of score | Absolute score | Amount | Activity\n")
-    message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {:.70}".format(
+    message = "{}{:04.3g} | {:5.4n} | {:5.4n} | {}".format(
         tab_character * __level,
         _lca_obj.score / _total_score,
         _lca_obj.score,

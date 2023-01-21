@@ -232,7 +232,7 @@ def print_recursive_supply_chain(
 
     if cutoff > 0 and amount < cutoff:
         return
-    message = "{}{:.3g}: {:.70}".format(tab_character * __level, amount, str(activity))
+    message = "{}{:.3g}: {}".format(tab_character * __level, amount, str(activity))
     file_obj.write(message + "\n")
     if __level < max_level:
         prod_exchanges = list(activity.production())

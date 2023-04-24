@@ -1,5 +1,11 @@
 # analyzer Changelog
 
+## 0.11.5 (2023-04-24)
+
+* [#23](https://github.com/brightway-lca/brightway2-analyzer/pull/23): Remove the length limit on the printed strings
+* [#22](https://github.com/brightway-lca/brightway2-analyzer/pull/22): Fix contribution analysis error
+* [#21](https://github.com/brightway-lca/brightway2-analyzer/pull/21): Badges
+
 ## 0.11.4 (2022-07-04)
 
 * Add `use_matrix_values` to `recursive_calculation_to_object` and `print_recursive_calculation` for Monte Carlo

@@ -1,5 +1,9 @@
 # analyzer Changelog
 
+## 0.11.6 (2023-04-25)
+
+Remove incorrect dependencies
+
 ## 0.11.5 (2023-04-24)
 
 * [#23](https://github.com/brightway-lca/brightway2-analyzer/pull/23): Remove the length limit on the printed strings

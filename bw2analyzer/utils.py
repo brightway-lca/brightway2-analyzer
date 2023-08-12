@@ -3,11 +3,11 @@ import string
 import sys
 from warnings import warn
 
+from bw2data import Database, databases, get_activity, methods
+from tqdm import tqdm
 import bw2calc as bc
 import numpy as np
 import pandas as pd
-import pyprind
-from bw2data import Database, databases, get_activity, methods
 
 
 def contribution_for_all_datasets_one_method(database, method, progress=True):
@@ -60,10 +60,8 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         "all": np.zeros((all_cutoff, cols), dtype=np.float32),
     }
 
-    pbar = pyprind.ProgBar(len(db), title="Activities:")
-
     # Actual calculations
-    for ds in db:
+    for ds in tqdm(db):
         lca.redo_lcia({ds.id: 1})
         if not lca.score:
             continue
@@ -77,10 +75,6 @@ def contribution_for_all_datasets_one_method(database, method, progress=True):
         fill_number = results_all.shape[0]
         assert fill_number < all_cutoff, "Too many values in 'all'"
         results["all"][:fill_number, col] = results_all
-
-        pbar.update()
-
-    print(pbar)
 
     return results
 

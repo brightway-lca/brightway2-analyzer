@@ -4,10 +4,10 @@ lxml
 matplotlib
 numpy
 pandas
-pyprind
 requests
 scipy
 stats_arrays
 tabulate
+tqdm
 unicodecsv
 voluptuous

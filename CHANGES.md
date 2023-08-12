@@ -1,5 +1,9 @@
 # analyzer Changelog
 
+## 0.11.7 (2023-04-25)
+
+Remove `pyprind` dependency
+
 ## 0.11.6 (2023-04-25)
 
 Remove incorrect dependencies

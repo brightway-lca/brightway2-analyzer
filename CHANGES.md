@@ -1,4 +1,4 @@
-# analyzer Changelog
+# `bw2analyzer` Changelog
 
 ## 0.11.7 (2023-04-25)
 
